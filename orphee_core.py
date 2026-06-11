@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ORPHÉE v8.7 — Core
+ORPHÉE v8.9 — Core
 ======================
 Fonctions communes pour l'interface Streamlit locale :
 - analyse acoustique du yaourt/source,
@@ -105,6 +105,7 @@ class BuildContext:
     row_count: int
     section_signature: list[str]
     creative_coordinates: str
+    anchor_map_package: str
     creative_run_salt: str = "001"
     creative_mode: str = "EXPLORE"
     recent_direction_ledger: str = ""
@@ -361,7 +362,7 @@ def analyze_yaourt(yaourt: str, analyzer: Optional[Callable[[str], dict]] = None
 
 
 # ============================================================================
-# v8.8 — CREATIVE COORDINATE DIVERGENCE ENGINE
+# v8.9 — CREATIVE COORDINATE DIVERGENCE + ATTRACTOR BRAKES
 # ----------------------------------------------------------------------------
 # Le script local calcule ces coordonnées avant Prompt 1. Le modèle ne les
 # invente pas : il les exécute comme des contraintes de recherche abstraites.
@@ -429,6 +430,125 @@ ATTRACTOR_FUNCTION_CLUSTERS = {
     "silence-stretch-default": [r"\bsilence\b", r"\bquiet\b", r"\bpause", r"\blook away\b"],
     "process-metaphor-default": [r"\bsignal", r"\bscript", r"\bloop", r"\bpattern", r"\breset", r"\berase", r"\bfilter"],
 }
+
+
+# v8.9 — familles dramaturgiques profondes. Ce ne sont pas des listes de mots à
+# censurer bêtement : ce sont des attracteurs fonctionnels à rendre inéligibles
+# quand le ledger récent ou le titre les rend suspects.
+SUPER_ATTRACTOR_FAMILIES = {
+    "BLAME_CONCESSION_ENGINE": [
+        r"\bblame\b", r"\bfault\b", r"\bright\b", r"\bwrong\b", r"\bagree\b",
+        r"\bconced", r"\blast word\b", r"\bwin\b", r"\blose\b", r"\bapolog",
+        r"\bprendre le bl[âa]me\b", r"\bbl[âa]mes?\b", r"\btort\b", r"\braison\b",
+    ],
+    "HUMOR_COVER_ENGINE": [
+        r"\bjok", r"\blaugh", r"\bcough", r"\bfunny\b", r"\bpretend\b", r"\bsmil",
+        r"\bhumour\b", r"\bblague", r"\bjokes?\b", r"\brires?\b", r"\brire\b", r"\btoux\b",
+    ],
+    "META_CONVERSATION_ENGINE": [
+        r"\bword", r"\bsentence", r"\bphrase", r"\btalk", r"\bsay\b", r"\btell\b",
+        r"\banswer", r"\bfinish", r"\binterrupt", r"\bmouth\b", r"\bvoice\b",
+        r"\bmots?\b", r"\bphrase\b", r"\bparle", r"\bdire\b", r"\br[ée]pond",
+    ],
+    "SILENCE_MANAGEMENT_ENGINE": [
+        r"\bsilence\b", r"\bquiet\b", r"\bpause", r"\bsigh\b", r"\blook away\b",
+        r"\bsilenc", r"\btais", r"\bse taire\b", r"\bsoupir", r"\bpause",
+    ],
+    "LITERAL_EXIT_ENGINE": [
+        r"\btime to go\b", r"\bgo\b", r"\bleave\b", r"\bdoor\b", r"\bwalk\b", r"\baway\b",
+        r"\bpartir\b", r"\bsortir\b", r"\bporte\b", r"\bd[ée]part", r"\bs'en aller\b",
+    ],
+    "SOURCE_ECHO_ENGINE": [
+        r"\bside\b", r"\breason\b", r"\bfun\b", r"\bfade\b", r"\blonger\b",
+        r"\bc[ôo]t[ée]\b", r"\braison\b", r"\bamus", r"\bplus longtemps\b",
+    ],
+}
+
+TITLE_ATTRACTOR_PATTERNS = {
+    "LITERAL_EXIT_ENGINE": [r"\bgo\b", r"\bleave\b", r"\bwalk\b", r"\bstay\b", r"\bhome\b", r"\breturn\b", r"\bpartir\b", r"\bsortir\b", r"\brester\b"],
+    "SILENCE_MANAGEMENT_ENGINE": [r"\bsilence\b", r"\bquiet\b", r"\bpause\b", r"\btais\b"],
+    "BLAME_CONCESSION_ENGINE": [r"\bblame\b", r"\bfault\b", r"\bwrong\b", r"\bsorry\b", r"\btort\b", r"\bbl[âa]me\b"],
+    "HUMOR_COVER_ENGINE": [r"\bjoke\b", r"\blaugh\b", r"\brire\b", r"\bblague\b"],
+}
+
+
+def detect_family_hits(text: str, families: dict[str, list[str]]) -> dict[str, int]:
+    low = (text or "").lower()
+    hits: dict[str, int] = {}
+    for family, pats in families.items():
+        count = 0
+        for pat in pats:
+            count += len(re.findall(pat, low, flags=re.I))
+        if count:
+            hits[family] = count
+    return hits
+
+
+def classify_title_attractors(title: str) -> list[str]:
+    hits = detect_family_hits(title, TITLE_ATTRACTOR_PATTERNS)
+    return sorted(hits.keys())
+
+
+def expand_recent_direction_ledger(raw: str | None, title: str = "") -> str:
+    base = re.sub(r"\s+", " ", (raw or "").strip())
+    title_hits = classify_title_attractors(title)
+    ledger_hits = detect_family_hits(base, SUPER_ATTRACTOR_FAMILIES)
+    if not base:
+        base = "No explicit recent-direction ledger supplied. Use global ORPHÉE familiarity veto only."
+    lines = [base]
+    if ledger_hits:
+        lines.append("\nEXPANDED FUNCTION-FAMILY VETOES FROM USER LEDGER:")
+        for fam, count in sorted(ledger_hits.items()):
+            lines.append(f"- {fam}: detected from ledger markers ({count}). This family cannot win or become chorus/hook engine.")
+    if title_hits:
+        lines.append("\nTITLE-LITERALIZATION RISK:")
+        for fam in title_hits:
+            lines.append(f"- {fam}: title words belong to this default family. Title phrase must be transposed, not used as obvious hook unless explicitly authorized.")
+    lines.append("\nGLOBAL v8.9 SUPER-ATTRACTOR VETOES:")
+    lines.append("- If a candidate can be summarized as blame/concession, humor-cover, meta-conversation, silence-management, literal-exit, or direct source-echo, it is ineligible when that family appears above or in recent outputs.")
+    lines.append("- Generic user wording such as 'les blâmes, les jokes et les rires' expands to BLAME_CONCESSION_ENGINE + HUMOR_COVER_ENGINE, including synonyms and functional equivalents.")
+    return "\n".join(lines)[:2600]
+
+
+def build_strong_anchor_package(rows: list[BlueprintRow]) -> str:
+    if not rows:
+        return """\n══════════════════════════════════════════════════════════\nLOCAL STRONG ANCHOR MAP — v8.9\n══════════════════════════════════════════════════════════\nFREE_STRUCTURE MODE: no local source anchors available.\n""".strip()
+    analyzer = load_phonetic_engine()
+    lines = [
+        "\n══════════════════════════════════════════════════════════",
+        "LOCAL STRONG ANCHOR MAP — v8.9 SCRIPT-COMPUTED / PROMPT 2 MUST USE",
+        "══════════════════════════════════════════════════════════",
+        "This map is computed from the source line + local stress pattern. It does not predict the final line; it marks where Prompt 2 must protect source strong/content slots.",
+        "Rule: on listed critical syllable slots, do not place HARD_WEAK words (articles/prepositions/particles such as the/a/of/to/for/at/on/out/off) unless the source slot was also weak.",
+        "Rows shown are high-risk: partitioned rows, 8+ syllable rows, chorus/bridge rows, or repeated structures.",
+        "If a candidate line cannot satisfy these anchors, mark ANCHOR_OK = NO and repair before Handoff 2. Do not self-certify.",
+        "",
+        "| Row | Section | Target | Critical strong/content source anchors |",
+        "|---:|---|---|---|",
+    ]
+    for row in rows:
+        high_risk = (row.total >= 8) or ("+" in row.partition) or ("CHORUS" in row.section.upper()) or ("BRIDGE" in row.section.upper())
+        if not high_risk:
+            continue
+        stress = flatten_stress_pattern(row.stress)
+        profile = syllable_word_profile(row.source_line, analyzer)
+        anchors = []
+        n = min(len(stress), len(profile))
+        last = None
+        for idx in range(n):
+            if stress[idx] != "DUM":
+                continue
+            item = profile[idx]
+            if item["class"] != "CONTENT":
+                continue
+            key = (idx + 1, item["word"])
+            if key == last:
+                continue
+            anchors.append(f"{idx+1}:{item['word']}")
+            last = key
+        if anchors:
+            lines.append(f"| {row.row_id:03d} | {escape_md_cell(row.section)} | {escape_md_cell(row.partition)} ({row.total}) | {escape_md_cell(', '.join(anchors[:12]))} |")
+    return "\n".join(lines).strip()
 
 
 def stable_checksum(text: str) -> int:
@@ -515,7 +635,7 @@ def build_creative_coordinate_package(
     analyzer = load_phonetic_engine()
     salt = normalize_run_salt(run_salt)
     mode = normalize_creative_mode(creative_mode)
-    ledger = compact_ledger(recent_direction_ledger)
+    ledger = expand_recent_direction_ledger(compact_ledger(recent_direction_ledger), title)
 
     title_syll = count_title_syllables(title, analyzer)
     row_count = len(rows)
@@ -540,7 +660,7 @@ def build_creative_coordinate_package(
     base = {"c": c_idx, "g": g_idx, "r": r_idx, "s": s_idx, "d": d_idx, "avoid": avoid_idx}
     slots = build_candidate_coordinate_slots(base, salt_shift, mode_shift)
 
-    run_id = f"ORPHEE-v8.8-{checksum % 9973:04d}-{salt_checksum % 7919:04d}-{ledger_checksum % 6841:04d}-{mode}"
+    run_id = f"ORPHEE-v8.9-{checksum % 9973:04d}-{salt_checksum % 7919:04d}-{ledger_checksum % 6841:04d}-{mode}"
 
     source_variables = (
         f"T_title_syllables={title_syll}; R_row_count={row_count}; S_section_count={section_count}; "
@@ -566,7 +686,7 @@ def build_creative_coordinate_package(
 
     return f"""
 ══════════════════════════════════════════════════════════
-CREATIVE COORDINATE DIVERGENCE PACKAGE — v8.8 LOCAL-COMPUTED / MUST-ECHO
+CREATIVE COORDINATE DIVERGENCE PACKAGE — v8.9 LOCAL-COMPUTED / MUST-ECHO
 ══════════════════════════════════════════════════════════
 RUN_ID: {run_id}
 CREATIVE_MODE: {mode}
@@ -580,7 +700,7 @@ LANGUAGE: {language}
 LOCAL VARIABLES:
 {source_variables}
 
-RECENT DIRECTION EXCLUSION LEDGER:
+RECENT DIRECTION EXCLUSION LEDGER — EXPANDED BY LOCAL SCRIPT:
 {ledger}
 
 BASE COORDINATES:
@@ -604,6 +724,9 @@ EXECUTION RULES:
 7. Do not allow blame/fight/agree/last-word/concession engines to win if the ledger or source package already points to recent use of that family.
 8. Selection formula: FINAL_SCORE = HumanPressure + SourceGrammar + Singability + Specificity + (2 × FunctionalDistance) + CoordinateObedience - FamiliarityPenalty.
 9. A candidate with FAMILIARITY_VETO = YES is ineligible regardless of score.
+10. SUPER-ATTRACTOR VETO: if a candidate is built around a blocked family in the expanded ledger, it is ineligible even if the exact blocked words never appear.
+11. SOURCE SEMANTIC TRANSPOSITION: preserve rhythmic / relational pressure from the source, but do not preserve its obvious semantic field as the final concept unless explicitly authorized.
+12. TITLE-LITERALIZATION BRAKE: if the title is classified as a default family, do not use its literal phrase as chorus/hook engine; transpose it into behavioral pressure.
 
 MODE RULE:
 {mode_rule}
@@ -617,13 +740,15 @@ After selecting the engine, create a song-specific lexical reservoir:
 Use this reservoir lightly during drafting. It is a compass, not a cage.
 
 ATTENTION CONTROL:
-This coordinate package governs ideation only. Once the Foundation Brief is selected, return attention to human pressure, source grammar, singability, and row completeness.
+This coordinate package governs ideation only, but its vetoes remain active through Prompt 2 and Prompt 3. Once the Foundation Brief is selected, return attention to human pressure, source grammar, singability, and row completeness.
 """.strip()
 
-def lexical_attractor_report(lyric_lines: list[str]) -> list[str]:
+def lexical_attractor_report(lyric_lines: list[str]) -> tuple[list[str], int]:
     text = "\n".join(lyric_lines).lower()
-    lines = ["\n4. ATTRACTOR FUNCTION REPORT — QUALITY WATCH ONLY"]
+    lines = ["\n4. ATTRACTOR FUNCTION REPORT — v8.9 QUALITY GATE"]
     any_hit = False
+    quality_fail = 0
+    # Surface clusters from previous versions.
     for cluster, patterns in ATTRACTOR_FUNCTION_CLUSTERS.items():
         hits: list[str] = []
         count = 0
@@ -637,12 +762,23 @@ def lexical_attractor_report(lyric_lines: list[str]) -> list[str]:
             any_hit = True
             severity = "WATCH"
             if count >= 4:
-                severity = "FAIL-QUALITY"  # pas fatal métrique; à traiter par Prompt 3 / correction.
+                severity = "FAIL-QUALITY"
+                quality_fail += 1
             lines.append(f"{severity} | {cluster} | occurrences≈{count} | markers={', '.join(sorted(set(hits))[:8])}")
+    # Deep dramaturgical families. Lower threshold because these are functional attractors.
+    family_hits = detect_family_hits(text, SUPER_ATTRACTOR_FAMILIES)
+    for family, count in sorted(family_hits.items()):
+        if count >= 6:
+            any_hit = True
+            quality_fail += 1
+            lines.append(f"FAIL-QUALITY | {family} | functional dominance≈{count} | requires conceptual repair, not synonym swap")
+        elif count >= 3:
+            any_hit = True
+            lines.append(f"WATCH | {family} | functional presence≈{count} | monitor for dominance")
     if not any_hit:
         lines.append("✅ No obvious default-function cluster dominance detected.")
-    lines.append("NOTE : ce rapport ne remplace pas l'audit mécanique. Il sert à détecter les fonctions dramatiques répétées entre générations.")
-    return lines
+    lines.append("NOTE : v8.9 treats FAIL-QUALITY as a quality gate. It is not a syllable/partition failure, but it blocks a final-ready status because the lyric has collapsed into a default dramatic family.")
+    return lines, quality_fail
 
 def detect_source_mode(yaourt: str, title: str, instructions: str) -> str:
     return "LOCKED_SOURCE" if yaourt.strip() else "FREE_STRUCTURE"
@@ -677,6 +813,7 @@ def build_context(title: str, title_source: str, instructions: str, yaourt: str,
         language = detect_language(f"{title}\n{instructions}") if (title.strip() or instructions.strip()) else "ENGLISH"
 
     creative_coordinates = build_creative_coordinate_package(title, instructions, rows, section_signature, language, mode, run_salt=run_salt, creative_mode=creative_mode, recent_direction_ledger=recent_direction_ledger)
+    anchor_map_package = build_strong_anchor_package(rows)
 
     return BuildContext(
         title=title,
@@ -692,9 +829,10 @@ def build_context(title: str, title_source: str, instructions: str, yaourt: str,
         row_count=len(rows),
         section_signature=section_signature,
         creative_coordinates=creative_coordinates,
+        anchor_map_package=anchor_map_package,
         creative_run_salt=normalize_run_salt(run_salt),
         creative_mode=normalize_creative_mode(creative_mode),
-        recent_direction_ledger=compact_ledger(recent_direction_ledger),
+        recent_direction_ledger=expand_recent_direction_ledger(compact_ledger(recent_direction_ledger), title),
     )
 
 
@@ -711,6 +849,7 @@ SOURCE MODE: {ctx.source_mode}
 LOCAL BLUEPRINT ROW COUNT: {ctx.row_count if ctx.rows else 'N/A — FREE_STRUCTURE'}
 CREATIVE MODE: {getattr(ctx, 'creative_mode', 'EXPLORE')}
 CREATIVE RUN SALT: {getattr(ctx, 'creative_run_salt', '001')}
+RECENT DIRECTION LEDGER STATUS: expanded locally; see Prompt 1 divergence package
 EXPECTED HANDOFF SOURCE VERSION: {expected_handoff_version or 'N/A'}
 
 USER CREATIVE OVERRIDE / OPTIONAL INSTRUCTIONS:
@@ -753,7 +892,7 @@ def assembler_prompt_2(ctx: BuildContext, handoff1: str) -> str:
     expected = "ORPHÉE-SOURCE Prompt 1 v1.2 final"
     tpl = apply_common_replacements(tpl, ctx, expected_handoff=expected)
     pre = metadata_block(ctx, "PROMPT 2 / TOPLINER", expected)
-    blueprint = f"{pre}\n\nFULL ACOUSTIC BLUEPRINT OR FREE-STRUCTURE NOTICE:\n{ctx.blueprint_full}"
+    blueprint = f"{pre}\n\nFULL ACOUSTIC BLUEPRINT OR FREE-STRUCTURE NOTICE:\n{ctx.blueprint_full}\n\n{getattr(ctx, 'anchor_map_package', '')}"
     out = inject_zone(tpl, BLUEPRINT_ZONE_RE, "°#b#°0°", "°#b#°9°", blueprint)
     out = inject_zone(out, HANDOFF_ZONE_RE, "°#h#°0°", "°#h#°9°", handoff1 or "Paste HANDOFF 1 from ORPHÉE-SOURCE here.")
     return out
@@ -764,7 +903,7 @@ def assembler_prompt_3(ctx: BuildContext, handoff2: str) -> str:
     expected = "ORPHÉE-TOPLINER Prompt 2 v1.0 final"
     tpl = apply_common_replacements(tpl, ctx, expected_handoff=expected)
     pre = metadata_block(ctx, "PROMPT 3 / FINALIZER", expected)
-    blueprint = f"{pre}\n\nFULL ACOUSTIC BLUEPRINT OR FREE-STRUCTURE NOTICE:\n{ctx.blueprint_full}"
+    blueprint = f"{pre}\n\nFULL ACOUSTIC BLUEPRINT OR FREE-STRUCTURE NOTICE:\n{ctx.blueprint_full}\n\n{getattr(ctx, 'anchor_map_package', '')}"
     out = inject_zone(tpl, BLUEPRINT_ZONE_RE, "°#b#°0°", "°#b#°9°", blueprint)
     out = inject_zone(out, HANDOFF_ZONE_RE, "°#h#°0°", "°#h#°9°", handoff2 or "Paste HANDOFF 2 from ORPHÉE-TOPLINER here.")
     return out
@@ -985,7 +1124,10 @@ def audit_final_text(final_text: str, blueprint_rows: list[BlueprintRow]) -> tup
     report.append(f"Erreurs de partition fatales        : {fatal_partition}")
     report.append(f"Erreurs attaques fortes fatales     : {fatal_attack}")
     report.append(f"Avertissements rythme/rime/attaque  : {warnings}")
-    report.extend(lexical_attractor_report(lyric_lines))
+    attr_lines, quality_fail = lexical_attractor_report(lyric_lines)
+    report.extend(attr_lines)
+    if quality_fail:
+        issues.append(AuditIssue("QUALITY", None, "ATTRACTOR_FUNCTION", f"{quality_fail} attracteur(s) fonctionnel(s) en FAIL-QUALITY."))
     report.append("\n5. STATUT")
     report.append("STATUT FINAL : " + ("✅ CONFORME" if not issues else "❌ CORRECTION REQUISE"))
     return "\n".join(report), issues

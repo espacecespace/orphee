@@ -74,7 +74,7 @@ All objects, spaces, domains, body symptoms, voice mechanics, title vocabulary, 
 Your final deliverable is HANDOFF 1 for Prompt 2.
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.8 — CREATIVE COORDINATE DIVERGENCE ENGINE
+CRITICAL v8.9 — CREATIVE COORDINATE DIVERGENCE ENGINE
 ══════════════════════════════════════════════════════════
 
 The local interface MUST inject a CREATIVE COORDINATE DIVERGENCE PACKAGE before the source table.
@@ -115,6 +115,45 @@ After selecting the Foundation Brief, create a compact LEXICAL RESERVOIR:
 The reservoir is a compass, not a cage.
 Do not let this procedure dominate the lyric.
 Once the engine is selected, return attention to human pressure, section movement, and singable row-complete language.
+
+
+══════════════════════════════════════════════════════════
+CRITICAL v8.9 — SUPER-ATTRACTOR VETO / SOURCE TRANSPOSITION / TITLE BRAKE
+══════════════════════════════════════════════════════════
+
+A user ledger may be short, messy, bilingual, or lexical, for example "les blâmes, les jokes et les rires".
+Treat it as a FUNCTION-FAMILY VETO, not a tiny word ban:
+- blâme / blame / fault / right / wrong / agree / last-word / concession => BLAME_CONCESSION_ENGINE.
+- joke / rire / laugh / cough / pretend / funny deflection => HUMOR_COVER_ENGINE.
+- talk / sentence / phrase / words / answer / silence / pause => META_CONVERSATION or SILENCE_MANAGEMENT if they become the engine.
+
+SUPER-ATTRACTOR VETO:
+If an angle can be summarized as one of these families and that family appears in the expanded ledger, title risk, or recent outputs, it is ineligible:
+1. BLAME_CONCESSION_ENGINE
+2. HUMOR_COVER_ENGINE
+3. META_CONVERSATION_ENGINE
+4. SILENCE_MANAGEMENT_ENGINE
+5. LITERAL_EXIT_ENGINE
+6. SOURCE_ECHO_ENGINE
+
+TITLE-LITERALIZATION BRAKE:
+If the title itself belongs to a default function family, do not use the literal title phrase as chorus/hook engine.
+Translate the title into a behavioral pressure. A title-derived word may appear locally only if it does not carry the main hook.
+
+SOURCE SEMANTIC TRANSPOSITION:
+Preserve source rhythm, pressure, gesture, and relational energy.
+Do not preserve the source's obvious semantic field as the concept unless the coordinate slot explicitly requires it and it is not vetoed.
+If the source is verbal, do not automatically write a song about talking, phrases, words, answers, silence, or finishing sentences.
+If the source contains conflict words, do not automatically write a song about blame, being right/wrong, agreeing, apologizing, or taking the last word.
+
+ANTI-SYNONYM-LAUNDERING:
+A candidate fails if it avoids the exact forbidden words but keeps the same function.
+Example principle, not a lyric instruction: replacing "joke" with another humor-cover action is still HUMOR_COVER.
+Replacing "blame" with "I say you're right" is still BLAME_CONCESSION.
+Replacing literal leaving with "go quiet" is still LITERAL_EXIT / SILENCE_MANAGEMENT.
+
+HARD SELECTION LAW:
+A candidate with a super-attractor veto cannot win, even if it is cleaner, more singable, or more emotionally obvious than the farther candidates.
 
 
 ══════════════════════════════════════════════════════════

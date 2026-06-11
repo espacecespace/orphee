@@ -26,7 +26,7 @@ from orphee_core import (
     slugify_filename,
 )
 
-APP_VERSION = "v8.8 divergence"
+APP_VERSION = "v8.9 béton"
 
 st.set_page_config(
     page_title="ORPHÉE — Générateur guidé",
@@ -357,7 +357,7 @@ instructions = st.text_area(
     key="instructions_box",
 )
 
-st.markdown("#### Divergence créative v8.8")
+st.markdown("#### Divergence créative v8.9")
 col_div1, col_div2 = st.columns([1, 1])
 with col_div1:
     creative_mode = st.selectbox(
@@ -378,8 +378,8 @@ recent_direction_ledger = st.text_area(
     "Mémoire anti-répétition / directions récentes à éviter",
     value=st.session_state.get("recent_direction_ledger", ""),
     height=90,
-    placeholder="Ex. éviter : blame/fight/agree/last word; éviter les refrains basés sur prendre le blâme ou désamorcer une dispute; éviter laugh/joke/cough/backpedaling…",
-    help="Ce bloc est injecté dans le paquet mathématique. Il sert de veto de familiarité, pas de simple banlist lexicale.",
+    placeholder="Ex. les blâmes, les jokes et les rires; éviter aussi les refrains d’accord/concession, le titre littéral, les silences/pauses comme moteur…",
+    help="Injecté puis élargi par le script local : ex. blâmes → famille BLAME_CONCESSION, jokes/rires → HUMOR_COVER. Sert de veto fonctionnel, pas de simple banlist.",
     key="recent_direction_ledger_box",
 )
 

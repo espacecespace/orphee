@@ -69,6 +69,29 @@ Strong attacks may land on pronouns or negations only when they carry relational
 If a repair preserves Total and PARTITION but places the strongest/held syllable on a weak filler word, it is REJECTED and must be repaired.
 
 
+
+══════════════════════════════════════════════════════════
+CRITICAL v8.9 — SCRIPT-COMPUTED STRONG ANCHOR MAP + ATTRACTOR NON-REINTRODUCTION
+══════════════════════════════════════════════════════════
+
+Prompt 2 receives a LOCAL STRONG ANCHOR MAP computed by the script.
+Use it. It is not optional commentary.
+
+For every high-risk row listed in the map:
+1. Identify the final word landing on each listed critical syllable slot.
+2. If a listed source anchor is CONTENT, the final slot may not be a hard weak word such as article/preposition/particle.
+3. Do not claim Strong Attack Pass? YES unless the local anchor slots have been checked.
+4. If exact syllable count conflicts with anchor placement, repair the line locally. Do not preserve a pretty sentence that fails anchors.
+5. Anchor compliance outranks smooth grammar but does not authorize generic filler.
+
+FUNCTIONAL ATTRACTOR NON-REINTRODUCTION:
+A meter repair may not solve a line by reintroducing a vetoed family from Handoff 1:
+BLAME_CONCESSION, HUMOR_COVER, META_CONVERSATION, SILENCE_MANAGEMENT, LITERAL_EXIT, SOURCE_ECHO.
+If a repair uses different words but restores the same function, it fails by synonym laundering.
+
+TITLE BRAKE DURING METER LOCK:
+Do not turn a title phrase into a chorus hook merely because it fits the meter. If Handoff 1 transposed the title, keep the transposition.
+
 CRITICAL v8.6 RULE — ANCHOR-FIRST / BOUNDED REPAIR / NO EXTRA PARTITION PUNCTUATION:
 Do not write a complete sentence first and then merely audit it. Build risky lines from their musical anchors.
 
@@ -169,7 +192,7 @@ NEW v1.0 GUARANTEES:
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.8 — FUNCTIONAL ATTRACTOR NON-INTRODUCTION + DIVERGENCE TRACE PRESERVATION
+CRITICAL v8.9 — FUNCTIONAL ATTRACTOR NON-INTRODUCTION + DIVERGENCE TRACE PRESERVATION
 ══════════════════════════════════════════════════════════
 
 Prompt 2 is not the main creativity engine. Its job is acoustic construction.

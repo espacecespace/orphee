@@ -12,7 +12,7 @@
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.8 — FUNCTIONAL ATTRACTOR AUDIT / DIVERGENCE TRACE / NO SYNONYM LAUNDERING
+CRITICAL v8.9 — FUNCTIONAL ATTRACTOR AUDIT / DIVERGENCE TRACE / NO SYNONYM LAUNDERING
 ══════════════════════════════════════════════════════════
 
 Prompt 3 must audit not only words, but dramatic functions.
@@ -42,6 +42,30 @@ This is a compact quality audit, not a new creative pass.
 Do not rewrite the song merely to avoid a cluster.
 Only repair when the cluster dominates the hook, displaces the Human Pressure Engine, or appears as an unearned default solution.
 
+
+
+══════════════════════════════════════════════════════════
+CRITICAL v8.9 — QUALITY GATE IS A BRAKE, NOT A WEATHER REPORT
+══════════════════════════════════════════════════════════
+
+If the final lyric collapses into a vetoed super-attractor family, do not merely mention it.
+Repair locally before the final handoff or mark LOCAL_AUDIT_NEEDED if repair would break meter.
+
+FAIL-QUALITY in chorus/hook/Outro blocks MASTER CUT READY.
+This includes synonym laundering:
+- blame/concession without the word blame,
+- humor-cover without the word joke,
+- silence-management without the word silence,
+- literal-exit without the exact title phrase,
+- meta-conversation without the exact words "talk" or "sentence".
+
+SOURCE TRANSPOSITION CHECK:
+Verify the Master Cut preserves source pressure but does not simply re-skin the source semantic field.
+If the song is still about speaking, silence, blame, being right/wrong, literal exit, or a title phrase after those families were vetoed, repair before final delivery.
+
+ANCHOR MAP TRACE:
+If Prompt 2 was given a LOCAL STRONG ANCHOR MAP, preserve its anchor-risk notes.
+Do not certify downstream strong-attack risk as NONE unless the anchor proof exists for high-risk rows.
 
 ══════════════════════════════════════════════════════════
 MISSION — READ THIS FIRST

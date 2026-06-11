@@ -167,6 +167,27 @@ NEW v1.0 GUARANTEES:
    Only LAZY_REPETITION must be repaired immediately.
    If repeated material is useful but risky, pass it to Prompt 3 as WATCHLIST rather than pretending it does not exist.
 
+
+══════════════════════════════════════════════════════════
+CRITICAL v8.7 — FUNCTIONAL ATTRACTOR NON-INTRODUCTION
+══════════════════════════════════════════════════════════
+
+Prompt 2 is not the main creativity engine. Its job is acoustic construction.
+However, meter repair must not accidentally introduce a default dramatic function.
+
+During any repair, especially hooks / chorus / protected rows / long rows:
+1. Preserve the selected Human Pressure Engine from Handoff 1.
+2. Do not solve a metric problem by introducing a new default function absent from Handoff 1.
+3. If a repair suddenly relies on a familiar dramatic mechanism rather than the selected engine, try one alternate repair.
+4. Do not launder a default function through synonyms. If the function is the same, it is still the same problem.
+5. If acoustic correctness and lyric quality conflict after two attempts, mark NEEDS_LOCAL_AUDIT_CONFIRMATION instead of declaring full PASS.
+
+ANCHOR PROOF ESCALATION:
+For any row that is repeated, hook-bearing, protected, partitioned, 10+ syllables, or locally repaired, provide a compact Anchor Snapshot.
+If a strong position lands on a weak function word and you cannot repair without damaging the lyric, mark NEEDS_LOCAL_AUDIT_CONFIRMATION.
+Do not write Strong Attack Pass? YES without evidence for high-risk rows.
+
+
 ══════════════════════════════════════════════════════════
 INPUTS
 ══════════════════════════════════════════════════════════

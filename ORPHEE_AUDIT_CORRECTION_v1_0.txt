@@ -20,6 +20,11 @@ RÈGLES DE CORRECTION NON NÉGOCIABLES
 - Exemple : [2] + [14] ne doit pas devenir [2] + [12] + [2] à cause d’un mot composé avec trait d’union.
 - Maximum deux tentatives locales par ligne. Si tu ne peux pas corriger sans casser le texte, donne la meilleure version et indique LOCAL_AUDIT_NEEDED dans le rapport, mais le bloc final doit rester pur.
 - Retourne uniquement le bloc final pur, sans titre, sans commentaire, sans tableau.
+
+- Treat the local Attractor Function Report as a QUALITY WATCH, not as a mechanical meter failure.
+- If the report flags a default-function cluster, correct only when it dominates a hook, chorus, or repeated emotional solution.
+- Do not merely replace a flagged word with a synonym. Change the function only if the function itself is the problem.
+- Preserve all mechanically conforming lines unless they are explicitly listed as fatal or quality-fail.
 - Tu peux utiliser une boîte ```text``` uniquement si l'interface l'exige, mais le contenu interne doit rester pur.
 
 FORMAT DE SORTIE OBLIGATOIRE

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ORPHÉE v8.5 — Core
+ORPHÉE v8.7 — Core
 ======================
 Fonctions communes pour l'interface Streamlit locale :
 - analyse acoustique du yaourt/source,
@@ -104,6 +104,7 @@ class BuildContext:
     rows: list[BlueprintRow]
     row_count: int
     section_signature: list[str]
+    creative_coordinates: str
 
 
 @dataclass
@@ -355,6 +356,179 @@ def analyze_yaourt(yaourt: str, analyzer: Optional[Callable[[str], dict]] = None
     return "\n".join(source_pkg), "\n".join(full), "\n".join(reduced), rows, section_signature
 
 
+
+# ============================================================================
+# v8.7 — CREATIVE COORDINATE DIVERGENCE ENGINE
+# ----------------------------------------------------------------------------
+# Le script local calcule ces coordonnées avant Prompt 1. Le modèle ne les
+# invente pas : il les exécute comme des contraintes de recherche abstraites.
+# ============================================================================
+
+AXIS_CONTRADICTION = [
+    "hide-by-overexplaining",
+    "accelerate-to-avoid-response",
+    "help-by-withdrawing-help",
+    "ask-for-the-reaction-you-fear",
+    "refuse-the-victory-you-wanted",
+    "protect-someone-from-a-truth-that-already-protects-them",
+]
+
+AXIS_GESTURE = [
+    "interrupt-own-sentence",
+    "answer-the-wrong-question",
+    "change-politeness-level",
+    "obey-too-literally",
+    "make-invisible-habit-visible",
+    "let-the-other-person-complete-the-uncomfortable-action",
+]
+
+AXIS_RELATION_DISTANCE = [
+    "strangers-with-intimate-timing",
+    "friends-pretending-nothing-shifted",
+    "family-like-overfamiliarity-without-family-language",
+    "exes-without-breakup-language",
+    "colleagues-with-private-stakes",
+    "one-sided-care-misread-as-control",
+]
+
+AXIS_SURFACE = [
+    "syntax-error-as-emotion",
+    "over-specific-correction",
+    "literal-compliance-with-wrong-request",
+    "micro-delay-before-answer",
+    "social-rule-obeyed-until-it-breaks",
+    "unfinished-comparison-that-reveals-too-much",
+]
+
+AXIS_TITLE_DISPLACEMENT = [
+    "title-as-forbidden-action",
+    "title-as-timing-error",
+    "title-as-phrase-nobody-says",
+    "title-as-grammatical-misfire",
+    "title-as-misapplied-instruction",
+    "title-as-social-pressure-not-theme",
+]
+
+AXIS_DEFAULT_FUNCTION_TO_AVOID = [
+    "humor-cover-default",
+    "apology-loop-default",
+    "literal-exit-default",
+    "silence-stretch-default",
+    "object-anchor-default",
+    "thesis-chorus-default",
+]
+
+ATTRACTOR_FUNCTION_CLUSTERS = {
+    # Rapport qualité seulement : ces clusters ne bloquent pas mécaniquement.
+    "humor-cover-default": [r"\blaugh", r"\bjok", r"\bcough", r"\bfunny\b", r"\bpretend", r"\bmade it weird\b"],
+    "literal-exit-default": [r"\bleav", r"\bgo\b", r"\bdoor\b", r"\bwalk", r"\blate\b", r"\bsleep\b", r"\bplans\b"],
+    "apology-loop-default": [r"\bsorry\b", r"\bapolog", r"\bwrong\b", r"\bforgive"],
+    "silence-stretch-default": [r"\bsilence\b", r"\bquiet\b", r"\bpause", r"\blook away\b"],
+    "process-metaphor-default": [r"\bsignal", r"\bscript", r"\bloop", r"\bpattern", r"\breset", r"\berase", r"\bfilter"],
+}
+
+
+def stable_checksum(text: str) -> int:
+    clean = re.sub(r"\s+", " ", (text or "").strip().lower())
+    return sum((i + 1) * ord(ch) for i, ch in enumerate(clean))
+
+
+def count_title_syllables(title: str, analyzer: Callable[[str], dict]) -> int:
+    if not title.strip() or title.strip().upper() == "TITLE TO BE DETERMINED BY AI":
+        return 0
+    try:
+        return int((analyzer(title) or {}).get("count") or 0)
+    except Exception:
+        return 0
+
+
+def count_partitioned_rows(rows: list[BlueprintRow]) -> int:
+    return sum(1 for r in rows if "+" in (r.partition or ""))
+
+
+def build_creative_coordinate_package(title: str, instructions: str, rows: list[BlueprintRow], section_signature: list[str], language: str, source_mode: str) -> str:
+    analyzer = load_phonetic_engine()
+    title_syll = count_title_syllables(title, analyzer)
+    row_count = len(rows)
+    section_count = len(section_signature)
+    row7_total = rows[6].total if len(rows) >= 7 else (stable_checksum(instructions) % 12)
+    last_total = rows[-1].total if rows else ((stable_checksum(title + instructions) % 12) + 1)
+    comma_rows = count_partitioned_rows(rows)
+    short_rows = sum(1 for r in rows if r.total <= 5)
+    checksum = stable_checksum(title + "\n" + instructions + "\n" + (rows[0].source_line if rows else ""))
+
+    c_idx = (title_syll + row7_total + section_count + checksum) % 6
+    g_idx = (row_count + last_total + comma_rows + checksum // 7) % 6
+    r_idx = (title_syll * max(section_count, 1) + short_rows + checksum // 11) % 6
+    s_idx = (row7_total + last_total + comma_rows + checksum // 13) % 6
+    d_idx = (row_count - title_syll + section_count + checksum // 17) % 6
+    avoid_idx = (comma_rows * 3 + short_rows + last_total + checksum // 19) % 6
+
+    source_variables = f"""T_title_syllables={title_syll}; R_row_count={row_count}; S_section_count={section_count}; L7_row7_syllables={row7_total}; LL_last_row_syllables={last_total}; C_partitioned_rows={comma_rows}; H_short_rows={short_rows}; checksum={checksum}"""
+
+    return f"""
+══════════════════════════════════════════════════════════
+CREATIVE COORDINATE DIVERGENCE PACKAGE — v8.7 LOCAL-COMPUTED
+══════════════════════════════════════════════════════════
+This package was computed by the local script. Do not recalculate it. Do not treat it as decorative.
+Use it to force the ideation path away from default first-instinct solutions while preserving the source grammar.
+
+SOURCE MODE: {source_mode}
+LANGUAGE: {language}
+LOCAL VARIABLES:
+{source_variables}
+
+SELECTED COORDINATES:
+- CONTRADICTION_AXIS[{c_idx}]: {AXIS_CONTRADICTION[c_idx]}
+- GESTURE_AXIS[{g_idx}]: {AXIS_GESTURE[g_idx]}
+- RELATION_DISTANCE_AXIS[{r_idx}]: {AXIS_RELATION_DISTANCE[r_idx]}
+- SURFACE_AXIS[{s_idx}]: {AXIS_SURFACE[s_idx]}
+- TITLE_DISPLACEMENT_AXIS[{d_idx}]: {AXIS_TITLE_DISPLACEMENT[d_idx]}
+- DEFAULT_FUNCTION_TO_AVOID[{avoid_idx}]: {AXIS_DEFAULT_FUNCTION_TO_AVOID[avoid_idx]}
+
+EXECUTION RULE:
+Before selecting the Human Pressure Engine, generate exactly 6 candidate engines using these coordinates as search constraints.
+Each candidate must differ in at least 3 of the 5 abstract dimensions.
+Reject any candidate whose dramatic function collapses into the DEFAULT_FUNCTION_TO_AVOID unless source evidence makes it uniquely necessary.
+Do not solve the task by naming forbidden words or by replacing them with synonyms. Solve it by changing the behavioral function.
+
+LEXICAL RESERVOIR REQUIREMENT:
+After selecting the engine, create a song-specific lexical reservoir:
+- 8 behavior verbs specific to the selected engine,
+- 6 relational micro-actions,
+- 6 default dramatic functions to avoid for this song,
+- 4 strange but human phrase-shapes.
+Use this reservoir lightly during drafting. It is a compass, not a cage.
+
+ATTENTION CONTROL:
+This coordinate package governs ideation only. Once the Foundation Brief is selected, return attention to human pressure, source grammar, singability, and row completeness.
+""".strip()
+
+
+def lexical_attractor_report(lyric_lines: list[str]) -> list[str]:
+    text = "\n".join(lyric_lines).lower()
+    lines = ["\n4. ATTRACTOR FUNCTION REPORT — QUALITY WATCH ONLY"]
+    any_hit = False
+    for cluster, patterns in ATTRACTOR_FUNCTION_CLUSTERS.items():
+        hits: list[str] = []
+        count = 0
+        for pat in patterns:
+            found = re.findall(pat, text, flags=re.I)
+            if found:
+                count += len(found)
+                label = pat.replace(r"\b", "").replace("\\", "")
+                hits.append(label)
+        if count:
+            any_hit = True
+            severity = "WATCH"
+            if count >= 4:
+                severity = "FAIL-QUALITY"  # pas fatal métrique; à traiter par Prompt 3 / correction.
+            lines.append(f"{severity} | {cluster} | occurrences≈{count} | markers={', '.join(sorted(set(hits))[:8])}")
+    if not any_hit:
+        lines.append("✅ No obvious default-function cluster dominance detected.")
+    lines.append("NOTE : ce rapport ne remplace pas l'audit mécanique. Il sert à détecter les fonctions dramatiques répétées entre générations.")
+    return lines
+
 def detect_source_mode(yaourt: str, title: str, instructions: str) -> str:
     return "LOCKED_SOURCE" if yaourt.strip() else "FREE_STRUCTURE"
 
@@ -387,6 +561,8 @@ def build_context(title: str, title_source: str, instructions: str, yaourt: str)
         )
         language = detect_language(f"{title}\n{instructions}") if (title.strip() or instructions.strip()) else "ENGLISH"
 
+    creative_coordinates = build_creative_coordinate_package(title, instructions, rows, section_signature, language, mode)
+
     return BuildContext(
         title=title,
         title_source=title_source,
@@ -400,6 +576,7 @@ def build_context(title: str, title_source: str, instructions: str, yaourt: str)
         rows=rows,
         row_count=len(rows),
         section_signature=section_signature,
+        creative_coordinates=creative_coordinates,
     )
 
 
@@ -643,7 +820,8 @@ def audit_final_text(final_text: str, blueprint_rows: list[BlueprintRow]) -> tup
     report.append("NOTE : la partition est une contrainte dure. Exemple : [2] + [14] ≠ [16], même si le total syllabique est identique.")
     report.append("NOTE : les attaques fortes sont aussi musicales. Une position forte/tenue ne doit pas être déplacée sur un article ou une préposition faible si la source portait un vrai mot.")
     limit = min(len(lyric_lines), len(blueprint_rows))
-    fatal_metric = 0
+    fatal_total = 0
+    fatal_partition = 0
     fatal_attack = 0
     warnings = 0
     for i in range(limit):
@@ -656,8 +834,12 @@ def audit_final_text(final_text: str, blueprint_rows: list[BlueprintRow]) -> tup
         if total_ok and partition_ok and not attack_errors:
             report.append(f"✅ Row {row.row_id:03d} | {row.section} | OK | {line}")
         else:
-            if not (total_ok and partition_ok):
-                fatal_metric += 1
+            if not total_ok:
+                fatal_total += 1
+            if total_ok and not partition_ok:
+                fatal_partition += 1
+            elif not partition_ok:
+                fatal_partition += 1
             if attack_errors:
                 fatal_attack += len(attack_errors)
             msg = f"Row {row.row_id}: métrique / partition / attaque rejetée."
@@ -678,11 +860,13 @@ def audit_final_text(final_text: str, blueprint_rows: list[BlueprintRow]) -> tup
             warnings += 1
             report.append(f"   ⚠️ Rime cible: {row.rhyme} | obtenue: {rhyme}")
 
-    report.append("\n3. BILAN")
-    report.append(f"Erreurs structurelles/métriques : {len([x for x in issues if x.severity == 'ERROR'])}")
-    report.append(f"Erreurs métriques fatales       : {fatal_metric}")
-    report.append(f"Erreurs attaques fortes fatales : {fatal_attack}")
-    report.append(f"Avertissements rythme/rime/attaque : {warnings}")
+    report.append("\n3. BILAN MÉCANIQUE")
+    report.append(f"Erreurs totales syllabiques fatales : {fatal_total}")
+    report.append(f"Erreurs de partition fatales        : {fatal_partition}")
+    report.append(f"Erreurs attaques fortes fatales     : {fatal_attack}")
+    report.append(f"Avertissements rythme/rime/attaque  : {warnings}")
+    report.extend(lexical_attractor_report(lyric_lines))
+    report.append("\n5. STATUT")
     report.append("STATUT FINAL : " + ("✅ CONFORME" if not issues else "❌ CORRECTION REQUISE"))
     return "\n".join(report), issues
 

@@ -1,0 +1,28 @@
+Tu as généré le dernier Master Cut ORPHÉE.
+
+Voici un audit local indépendant basé sur le blueprint acoustique source. Tu dois corriger uniquement les lignes rejetées ou marquées comme avertissements critiques.
+
+RÈGLES DE CORRECTION NON NÉGOCIABLES
+- Ne change aucune ligne conforme, sauf si elle est explicitement listée dans les erreurs à corriger.
+- Ne change pas les titres de sections.
+- Ne change pas le nombre de lignes.
+- Ne fusionne aucune ligne.
+- Ne divise aucune ligne.
+- Préserve le moteur humain, les hooks fonctionnels et les lignes protégées du dernier Handoff.
+- Si une ligne est corrigée, elle doit respecter exactement la cible de syllabes et la partition demandée.
+- Retourne uniquement le bloc final pur, sans titre, sans commentaire, sans code fence, sans tableau.
+
+FORMAT DE SORTIE OBLIGATOIRE
+[SECTION] #n
+ligne
+ligne
+
+[SECTION] #n
+ligne
+ligne
+
+AUDIT LOCAL À APPLIQUER
+{{AUDIT_REPORT}}
+
+TEXTE FINAL ACTUEL À CORRIGER
+{{FINAL_TEXT}}

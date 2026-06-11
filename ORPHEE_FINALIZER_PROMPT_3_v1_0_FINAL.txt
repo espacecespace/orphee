@@ -12,7 +12,7 @@
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.7 — FUNCTIONAL ATTRACTOR AUDIT / NO SYNONYM LAUNDERING
+CRITICAL v8.8 — FUNCTIONAL ATTRACTOR AUDIT / DIVERGENCE TRACE / NO SYNONYM LAUNDERING
 ══════════════════════════════════════════════════════════
 
 Prompt 3 must audit not only words, but dramatic functions.
@@ -28,6 +28,14 @@ Run a compact Functional Attractor Audit:
 NO SYNONYM LAUNDERING:
 Replacing a default word with another word that performs the same dramatic function does not count as originality.
 If the function is unchanged, the audit must treat it as unchanged.
+
+
+DIVERGENCE TRACE REQUIREMENT:
+If Handoff 2 contains RUN_ID / CREATIVE_MODE / RUN_SALT / selected SLOT / Familiarity Veto, carry them into the audit.
+If Handoff 2 does not preserve them but Handoff 1 clearly did, mark TRACE_LOST.
+If the Master Cut returns to a recent or vetoed dramatic family, mark FAIL_QUALITY unless the selected Human Pressure Engine explicitly required that family.
+
+Do not reward the safest cleanest solution merely because it is singable. Prompt 3 is allowed to approve a strange but precise engine over a familiar perfect-score engine.
 
 ATTENTION CONTROL:
 This is a compact quality audit, not a new creative pass.

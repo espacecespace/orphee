@@ -105,6 +105,9 @@ class BuildContext:
     row_count: int
     section_signature: list[str]
     creative_coordinates: str
+    creative_run_salt: str = "001"
+    creative_mode: str = "EXPLORE"
+    recent_direction_ledger: str = ""
 
 
 @dataclass
@@ -358,7 +361,7 @@ def analyze_yaourt(yaourt: str, analyzer: Optional[Callable[[str], dict]] = None
 
 
 # ============================================================================
-# v8.7 — CREATIVE COORDINATE DIVERGENCE ENGINE
+# v8.8 — CREATIVE COORDINATE DIVERGENCE ENGINE
 # ----------------------------------------------------------------------------
 # Le script local calcule ces coordonnées avant Prompt 1. Le modèle ne les
 # invente pas : il les exécute comme des contraintes de recherche abstraites.
@@ -446,8 +449,74 @@ def count_partitioned_rows(rows: list[BlueprintRow]) -> int:
     return sum(1 for r in rows if "+" in (r.partition or ""))
 
 
-def build_creative_coordinate_package(title: str, instructions: str, rows: list[BlueprintRow], section_signature: list[str], language: str, source_mode: str) -> str:
+
+def normalize_run_salt(value: str | None) -> str:
+    raw = (value or "001").strip()
+    raw = re.sub(r"\s+", "-", raw)
+    return raw[:40] or "001"
+
+
+def normalize_creative_mode(value: str | None) -> str:
+    raw = (value or "EXPLORE").strip().upper()
+    aliases = {
+        "STABLE": "STABLE",
+        "EXPLORE": "EXPLORE",
+        "EXPLORER": "EXPLORE",
+        "NEW": "EXPLORE",
+        "EXPLORE NEW DIRECTION": "EXPLORE",
+        "FORCE FARTHER CONCEPTUAL DISTANCE": "FAR",
+        "FAR": "FAR",
+        "DISTANCE": "FAR",
+        "MAX": "FAR",
+        "MAX_DISTANCE": "FAR",
+    }
+    return aliases.get(raw, "EXPLORE")
+
+
+def compact_ledger(text: str | None) -> str:
+    clean = re.sub(r"\s+", " ", (text or "").strip())
+    if not clean:
+        return "No explicit recent-direction ledger supplied. Use global ORPHÉE familiarity veto only."
+    return clean[:1200]
+
+
+def build_candidate_coordinate_slots(base: dict, salt_shift: int, mode_shift: int) -> list[dict]:
+    slots: list[dict] = []
+    # Coefficients deliberately rotate the six-axis grid so each slot differs.
+    for k in range(6):
+        slots.append({
+            "slot": chr(ord('A') + k),
+            "contradiction": AXIS_CONTRADICTION[(base["c"] + k * 1 + salt_shift) % 6],
+            "gesture": AXIS_GESTURE[(base["g"] + k * 5 + mode_shift) % 6],
+            "relation": AXIS_RELATION_DISTANCE[(base["r"] + k * 3 + salt_shift + mode_shift) % 6],
+            "surface": AXIS_SURFACE[(base["s"] + k * 2 + salt_shift) % 6],
+            "title": AXIS_TITLE_DISPLACEMENT[(base["d"] + k * 4 + mode_shift) % 6],
+            "avoid": AXIS_DEFAULT_FUNCTION_TO_AVOID[(base["avoid"] + k * 5 + salt_shift) % 6],
+        })
+    return slots
+
+
+def build_creative_coordinate_package(
+    title: str,
+    instructions: str,
+    rows: list[BlueprintRow],
+    section_signature: list[str],
+    language: str,
+    source_mode: str,
+    run_salt: str = "001",
+    creative_mode: str = "EXPLORE",
+    recent_direction_ledger: str = "",
+) -> str:
+    """Build a visible, locally computed ideation package.
+
+    v8.8 correction: this package is injected directly into Prompt 1 and must
+    be echoed by the model. It includes a run salt and six precomputed slots.
+    """
     analyzer = load_phonetic_engine()
+    salt = normalize_run_salt(run_salt)
+    mode = normalize_creative_mode(creative_mode)
+    ledger = compact_ledger(recent_direction_ledger)
+
     title_syll = count_title_syllables(title, analyzer)
     row_count = len(rows)
     section_count = len(section_signature)
@@ -456,29 +525,65 @@ def build_creative_coordinate_package(title: str, instructions: str, rows: list[
     comma_rows = count_partitioned_rows(rows)
     short_rows = sum(1 for r in rows if r.total <= 5)
     checksum = stable_checksum(title + "\n" + instructions + "\n" + (rows[0].source_line if rows else ""))
+    salt_checksum = stable_checksum(salt)
+    ledger_checksum = stable_checksum(ledger)
+    mode_shift = {"STABLE": 0, "EXPLORE": 1, "FAR": 3}.get(mode, 1)
+    salt_shift = (salt_checksum + ledger_checksum + mode_shift * 17) % 6
 
-    c_idx = (title_syll + row7_total + section_count + checksum) % 6
-    g_idx = (row_count + last_total + comma_rows + checksum // 7) % 6
-    r_idx = (title_syll * max(section_count, 1) + short_rows + checksum // 11) % 6
-    s_idx = (row7_total + last_total + comma_rows + checksum // 13) % 6
-    d_idx = (row_count - title_syll + section_count + checksum // 17) % 6
-    avoid_idx = (comma_rows * 3 + short_rows + last_total + checksum // 19) % 6
+    c_idx = (title_syll + row7_total + section_count + checksum + salt_checksum) % 6
+    g_idx = (row_count + last_total + comma_rows + checksum // 7 + salt_checksum // 5) % 6
+    r_idx = (title_syll * max(section_count, 1) + short_rows + checksum // 11 + ledger_checksum) % 6
+    s_idx = (row7_total + last_total + comma_rows + checksum // 13 + salt_checksum // 3) % 6
+    d_idx = (row_count - title_syll + section_count + checksum // 17 + ledger_checksum // 7) % 6
+    avoid_idx = (comma_rows * 3 + short_rows + last_total + checksum // 19 + salt_checksum // 11) % 6
 
-    source_variables = f"""T_title_syllables={title_syll}; R_row_count={row_count}; S_section_count={section_count}; L7_row7_syllables={row7_total}; LL_last_row_syllables={last_total}; C_partitioned_rows={comma_rows}; H_short_rows={short_rows}; checksum={checksum}"""
+    base = {"c": c_idx, "g": g_idx, "r": r_idx, "s": s_idx, "d": d_idx, "avoid": avoid_idx}
+    slots = build_candidate_coordinate_slots(base, salt_shift, mode_shift)
+
+    run_id = f"ORPHEE-v8.8-{checksum % 9973:04d}-{salt_checksum % 7919:04d}-{ledger_checksum % 6841:04d}-{mode}"
+
+    source_variables = (
+        f"T_title_syllables={title_syll}; R_row_count={row_count}; S_section_count={section_count}; "
+        f"L7_row7_syllables={row7_total}; LL_last_row_syllables={last_total}; "
+        f"C_partitioned_rows={comma_rows}; H_short_rows={short_rows}; checksum={checksum}; "
+        f"run_salt={salt}; salt_checksum={salt_checksum}; mode={mode}"
+    )
+
+    slot_lines = []
+    for slot in slots:
+        slot_lines.append(
+            f"- SLOT {slot['slot']}: CONTRADICTION={slot['contradiction']} | "
+            f"GESTURE={slot['gesture']} | RELATION={slot['relation']} | "
+            f"SURFACE={slot['surface']} | TITLE_DISPLACEMENT={slot['title']} | "
+            f"AVOID_FUNCTION={slot['avoid']}"
+        )
+
+    mode_rule = {
+        "STABLE": "Prefer continuity, but still obey the familiarity veto if a recent ledger is supplied.",
+        "EXPLORE": "Prefer a candidate that is not the safest obvious winner when source grammar allows it.",
+        "FAR": "Favor conceptual distance over safety unless singability or source grammar breaks.",
+    }[mode]
 
     return f"""
 ══════════════════════════════════════════════════════════
-CREATIVE COORDINATE DIVERGENCE PACKAGE — v8.7 LOCAL-COMPUTED
+CREATIVE COORDINATE DIVERGENCE PACKAGE — v8.8 LOCAL-COMPUTED / MUST-ECHO
 ══════════════════════════════════════════════════════════
-This package was computed by the local script. Do not recalculate it. Do not treat it as decorative.
-Use it to force the ideation path away from default first-instinct solutions while preserving the source grammar.
+RUN_ID: {run_id}
+CREATIVE_MODE: {mode}
+RUN_SALT: {salt}
+
+This package was computed by the local script and injected into Prompt 1.
+Do not recalculate it. Do not treat it as decorative. If this package is absent, Prompt 1 must stop with ERROR — LOCAL DIVERGENCE PACKAGE MISSING.
 
 SOURCE MODE: {source_mode}
 LANGUAGE: {language}
 LOCAL VARIABLES:
 {source_variables}
 
-SELECTED COORDINATES:
+RECENT DIRECTION EXCLUSION LEDGER:
+{ledger}
+
+BASE COORDINATES:
 - CONTRADICTION_AXIS[{c_idx}]: {AXIS_CONTRADICTION[c_idx]}
 - GESTURE_AXIS[{g_idx}]: {AXIS_GESTURE[g_idx]}
 - RELATION_DISTANCE_AXIS[{r_idx}]: {AXIS_RELATION_DISTANCE[r_idx]}
@@ -486,11 +591,22 @@ SELECTED COORDINATES:
 - TITLE_DISPLACEMENT_AXIS[{d_idx}]: {AXIS_TITLE_DISPLACEMENT[d_idx]}
 - DEFAULT_FUNCTION_TO_AVOID[{avoid_idx}]: {AXIS_DEFAULT_FUNCTION_TO_AVOID[avoid_idx]}
 
-EXECUTION RULE:
-Before selecting the Human Pressure Engine, generate exactly 6 candidate engines using these coordinates as search constraints.
-Each candidate must differ in at least 3 of the 5 abstract dimensions.
-Reject any candidate whose dramatic function collapses into the DEFAULT_FUNCTION_TO_AVOID unless source evidence makes it uniquely necessary.
-Do not solve the task by naming forbidden words or by replacing them with synonyms. Solve it by changing the behavioral function.
+PRECOMPUTED CANDIDATE COORDINATE SLOTS:
+{chr(10).join(slot_lines)}
+
+EXECUTION RULES:
+1. In Section 3, echo RUN_ID, CREATIVE_MODE, RUN_SALT, the BASE COORDINATES, and all six SLOT labels.
+2. In A(-1), generate exactly one Human Pressure Angle from each SLOT A-F.
+3. No candidate may win if it repeats the RECENT DIRECTION EXCLUSION LEDGER, even if it scores highest on singability.
+4. Apply FAMILIARITY VETO before scoring: familiar-but-clean cannot win.
+5. If CREATIVE_MODE = FAR, the safest obvious source-level reading must lose unless every farther candidate breaks source grammar.
+6. Do not solve novelty by synonym laundering. Changing words while keeping the same dramatic function is a fail.
+7. Do not allow blame/fight/agree/last-word/concession engines to win if the ledger or source package already points to recent use of that family.
+8. Selection formula: FINAL_SCORE = HumanPressure + SourceGrammar + Singability + Specificity + (2 × FunctionalDistance) + CoordinateObedience - FamiliarityPenalty.
+9. A candidate with FAMILIARITY_VETO = YES is ineligible regardless of score.
+
+MODE RULE:
+{mode_rule}
 
 LEXICAL RESERVOIR REQUIREMENT:
 After selecting the engine, create a song-specific lexical reservoir:
@@ -503,7 +619,6 @@ Use this reservoir lightly during drafting. It is a compass, not a cage.
 ATTENTION CONTROL:
 This coordinate package governs ideation only. Once the Foundation Brief is selected, return attention to human pressure, source grammar, singability, and row completeness.
 """.strip()
-
 
 def lexical_attractor_report(lyric_lines: list[str]) -> list[str]:
     text = "\n".join(lyric_lines).lower()
@@ -533,7 +648,7 @@ def detect_source_mode(yaourt: str, title: str, instructions: str) -> str:
     return "LOCKED_SOURCE" if yaourt.strip() else "FREE_STRUCTURE"
 
 
-def build_context(title: str, title_source: str, instructions: str, yaourt: str) -> BuildContext:
+def build_context(title: str, title_source: str, instructions: str, yaourt: str, run_salt: str = "001", creative_mode: str = "EXPLORE", recent_direction_ledger: str = "") -> BuildContext:
     title = title.strip().upper() if title.strip() else "TITLE TO BE DETERMINED BY AI"
     instructions = instructions.strip()
     mode = detect_source_mode(yaourt, title, instructions)
@@ -561,7 +676,7 @@ def build_context(title: str, title_source: str, instructions: str, yaourt: str)
         )
         language = detect_language(f"{title}\n{instructions}") if (title.strip() or instructions.strip()) else "ENGLISH"
 
-    creative_coordinates = build_creative_coordinate_package(title, instructions, rows, section_signature, language, mode)
+    creative_coordinates = build_creative_coordinate_package(title, instructions, rows, section_signature, language, mode, run_salt=run_salt, creative_mode=creative_mode, recent_direction_ledger=recent_direction_ledger)
 
     return BuildContext(
         title=title,
@@ -577,6 +692,9 @@ def build_context(title: str, title_source: str, instructions: str, yaourt: str)
         row_count=len(rows),
         section_signature=section_signature,
         creative_coordinates=creative_coordinates,
+        creative_run_salt=normalize_run_salt(run_salt),
+        creative_mode=normalize_creative_mode(creative_mode),
+        recent_direction_ledger=compact_ledger(recent_direction_ledger),
     )
 
 
@@ -591,6 +709,8 @@ TITLE SOURCE: {ctx.title_source}
 DETECTED LANGUAGE: {ctx.language}
 SOURCE MODE: {ctx.source_mode}
 LOCAL BLUEPRINT ROW COUNT: {ctx.row_count if ctx.rows else 'N/A — FREE_STRUCTURE'}
+CREATIVE MODE: {getattr(ctx, 'creative_mode', 'EXPLORE')}
+CREATIVE RUN SALT: {getattr(ctx, 'creative_run_salt', '001')}
 EXPECTED HANDOFF SOURCE VERSION: {expected_handoff_version or 'N/A'}
 
 USER CREATIVE OVERRIDE / OPTIONAL INSTRUCTIONS:
@@ -624,7 +744,7 @@ def assembler_prompt_1(ctx: BuildContext) -> str:
     tpl = load_template(SOURCE_P1_TEMPLATE)
     tpl = apply_common_replacements(tpl, ctx)
     pre = metadata_block(ctx, "PROMPT 1 / SOURCE", "ORPHÉE-SOURCE Prompt 1 v1.2 final")
-    package = f"{pre}\n\nSOURCE / BLUEPRINT PACKAGE:\n{ctx.source_package}"
+    package = f"{pre}\n\n{ctx.creative_coordinates}\n\nSOURCE / BLUEPRINT PACKAGE:\n{ctx.source_package}"
     return inject_zone(tpl, SOURCE_ZONE_RE, "°#x#°0°", "°#x#°9°", package)
 
 

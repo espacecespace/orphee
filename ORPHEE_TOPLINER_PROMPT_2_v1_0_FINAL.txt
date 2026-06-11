@@ -169,7 +169,7 @@ NEW v1.0 GUARANTEES:
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.7 — FUNCTIONAL ATTRACTOR NON-INTRODUCTION
+CRITICAL v8.8 — FUNCTIONAL ATTRACTOR NON-INTRODUCTION + DIVERGENCE TRACE PRESERVATION
 ══════════════════════════════════════════════════════════
 
 Prompt 2 is not the main creativity engine. Its job is acoustic construction.
@@ -181,6 +181,19 @@ During any repair, especially hooks / chorus / protected rows / long rows:
 3. If a repair suddenly relies on a familiar dramatic mechanism rather than the selected engine, try one alternate repair.
 4. Do not launder a default function through synonyms. If the function is the same, it is still the same problem.
 5. If acoustic correctness and lyric quality conflict after two attempts, mark NEEDS_LOCAL_AUDIT_CONFIRMATION instead of declaring full PASS.
+
+
+DIVERGENCE TRACE PRESERVATION:
+If Handoff 1 contains a CREATIVE COORDINATE DIVERGENCE PACKAGE echo, extract and preserve in Handoff 2:
+- RUN_ID, CREATIVE_MODE, RUN_SALT,
+- selected SLOT if stated,
+- selected Human Pressure Engine,
+- Familiarity Veto result,
+- Recent Direction Exclusion Ledger.
+
+Prompt 2 may not override the selected engine for acoustic convenience.
+If a meter repair starts drifting toward a vetoed recent family (for example blame/fight/agree/last-word/concession when Handoff 1 vetoed it), mark FUNCTIONAL_DRIFT_RISK and try one alternate acoustic repair.
+If no alternate works, pass NEEDS_PROMPT_3_FUNCTIONAL_REVIEW instead of silently accepting the drift.
 
 ANCHOR PROOF ESCALATION:
 For any row that is repeated, hook-bearing, protected, partitioned, 10+ syllables, or locally repaired, provide a compact Anchor Snapshot.

@@ -74,12 +74,19 @@ All objects, spaces, domains, body symptoms, voice mechanics, title vocabulary, 
 Your final deliverable is HANDOFF 1 for Prompt 2.
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.7 — CREATIVE COORDINATE DIVERGENCE ENGINE
+CRITICAL v8.8 — CREATIVE COORDINATE DIVERGENCE ENGINE
 ══════════════════════════════════════════════════════════
 
-The local interface may inject a CREATIVE COORDINATE DIVERGENCE PACKAGE before the source table.
-This package is computed outside the model from title / row count / section count / row 7 / final row / partition density / short-row density.
+The local interface MUST inject a CREATIVE COORDINATE DIVERGENCE PACKAGE before the source table.
+This package is computed outside the model from title / row count / section count / row 7 / final row / partition density / short-row density / run salt / recent direction ledger.
 It is not decorative. Execute it.
+
+KILL SWITCH:
+If the injected package is missing, do not continue. Output exactly:
+ERROR — LOCAL DIVERGENCE PACKAGE MISSING.
+
+VISIBLE PROOF REQUIREMENT:
+In Section 3, echo the injected RUN_ID, CREATIVE_MODE, RUN_SALT, BASE COORDINATES, and six SLOT labels. If these are not visible in the output, the run is invalid.
 
 Purpose:
 - prevent default first-instinct dramatic functions,
@@ -88,13 +95,16 @@ Purpose:
 - preserve human relevance without naming concrete exceptions.
 
 Execution protocol before A(-1):
-1. Read the selected coordinates.
-2. Generate exactly 6 Human Pressure Angles using different coordinate combinations.
-3. No two angles may share more than 2 major abstract dimensions unless the source grammar forces it.
+1. Read the injected precomputed candidate SLOT A-F coordinates.
+2. Generate exactly 6 Human Pressure Angles: one and only one from each slot.
+3. No two angles may share the same conflict structure, narrator strategy, emotional transaction, or chorus function.
 4. Each angle must state its dominant dramatic function, not merely its topic.
-5. Reject any angle whose function collapses into the injected DEFAULT_FUNCTION_TO_AVOID, unless source evidence makes that function uniquely necessary.
-6. Do not solve the rejection by synonym laundering. Changing words while keeping the same function is a fail.
-7. Select the angle with the best balance of human pressure, source-grammar compatibility, singability, and distance from default behavior.
+5. Apply FAMILIARITY VETO before scoring. A familiar-but-clean candidate is ineligible, not merely lower-scored.
+6. If the Recent Direction Exclusion Ledger names a family such as blame / fight / agree / last word / concession / backpedaling / humor-cover, no candidate in that family may win.
+7. Reject any angle whose function collapses into the injected DEFAULT_FUNCTION_TO_AVOID, unless source evidence makes it uniquely necessary.
+8. Do not solve rejection by synonym laundering. Changing words while keeping the same function is a fail.
+9. Select with this formula: FINAL_SCORE = HumanPressure + SourceGrammar + Singability + Specificity + (2 × FunctionalDistance) + CoordinateObedience - FamiliarityPenalty.
+10. If the safest, cleanest, most obvious candidate wins by normal scoring, run NOT-THE-SAFEST-WINNER TEST and choose the highest viable farther candidate unless source grammar breaks.
 
 After selecting the Foundation Brief, create a compact LEXICAL RESERVOIR:
 - 8 behavior verbs specific to this song only,
@@ -144,9 +154,9 @@ Produce the following, in order:
 
 1. INPUT CONFIRMATION
 2. SOURCE GRAMMAR READING
-3. CREATIVE COORDINATE DIVERGENCE ENGINE
+3. CREATIVE COORDINATE DIVERGENCE ENGINE — ECHO LOCAL PACKAGE
 4. BAD-PREMISE QUARANTINE
-5. A(-1) — 6 HUMAN PRESSURE ANGLES
+5. A(-1) — 6 HUMAN PRESSURE ANGLES, one per SLOT A-F, with FAMILIARITY_VETO and FINAL_SCORE
 6. A0* — SELECTION + FOUNDATION BRIEF
 7. UNIVERSAL SALIENCE BUDGET DECLARATION
 8. SECTION BREATH MAP

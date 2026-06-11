@@ -26,7 +26,7 @@ from orphee_core import (
     slugify_filename,
 )
 
-APP_VERSION = "v8.1 friendly"
+APP_VERSION = "v8.8 divergence"
 
 st.set_page_config(
     page_title="ORPHÉE — Générateur guidé",
@@ -121,6 +121,9 @@ def init_state() -> None:
         "title_effective": "",
         "yaourt_text": "",
         "user_instructions": "",
+        "creative_run_salt": "001",
+        "creative_mode": "Explore New Direction",
+        "recent_direction_ledger": "",
         "prompt1": "",
         "handoff1": "",
         "prompt2": "",
@@ -147,7 +150,7 @@ def filename(prefix: str, title: str, suffix: str) -> str:
     return f"{slugify_filename(title or prefix)}_{suffix}.txt"
 
 
-def context_from_inputs(title_input: str, file_name_title: str, instructions: str, yaourt: str) -> BuildContext:
+def context_from_inputs(title_input: str, file_name_title: str, instructions: str, yaourt: str, run_salt: str, creative_mode: str, recent_direction_ledger: str) -> BuildContext:
     if title_input.strip():
         title = title_input.strip().upper()
         title_source = "manual_title"
@@ -160,7 +163,7 @@ def context_from_inputs(title_input: str, file_name_title: str, instructions: st
     else:
         title = "TITLE TO BE DETERMINED BY AI"
         title_source = "no_title"
-    return build_context(title, title_source, instructions, yaourt)
+    return build_context(title, title_source, instructions, yaourt, run_salt=run_salt, creative_mode=creative_mode, recent_direction_ledger=recent_direction_ledger)
 
 
 def set_step(step: int) -> None:
@@ -354,6 +357,32 @@ instructions = st.text_area(
     key="instructions_box",
 )
 
+st.markdown("#### Divergence créative v8.8")
+col_div1, col_div2 = st.columns([1, 1])
+with col_div1:
+    creative_mode = st.selectbox(
+        "Mode de direction",
+        ["Stable", "Explore New Direction", "Force Farther Conceptual Distance"],
+        index=["Stable", "Explore New Direction", "Force Farther Conceptual Distance"].index(st.session_state.get("creative_mode", "Explore New Direction")),
+        help="Stable garde une direction reproductible. Explore force une autre zone si possible. Distance maximale pénalise fortement les moteurs trop familiers.",
+        key="creative_mode_box",
+    )
+with col_div2:
+    run_salt = st.text_input(
+        "Run Salt",
+        value=st.session_state.get("creative_run_salt", "001"),
+        help="Changez 001 → 002 → 003 pour forcer une autre coordonnée créative avec le même titre et le même yaourt.",
+        key="creative_run_salt_box",
+    )
+recent_direction_ledger = st.text_area(
+    "Mémoire anti-répétition / directions récentes à éviter",
+    value=st.session_state.get("recent_direction_ledger", ""),
+    height=90,
+    placeholder="Ex. éviter : blame/fight/agree/last word; éviter les refrains basés sur prendre le blâme ou désamorcer une dispute; éviter laugh/joke/cough/backpedaling…",
+    help="Ce bloc est injecté dans le paquet mathématique. Il sert de veto de familiarité, pas de simple banlist lexicale.",
+    key="recent_direction_ledger_box",
+)
+
 yaourt = ""
 file_title = ""
 if source_mode_choice == "Coller le texte":
@@ -387,12 +416,15 @@ if st.button("🎵 Générer le Prompt 1", type="primary", use_container_width=T
         st.error("Ajoutez au moins un titre, des instructions ou un yaourt/source.")
         st.stop()
     try:
-        ctx = context_from_inputs(title_input, file_title, instructions, yaourt)
+        ctx = context_from_inputs(title_input, file_title, instructions, yaourt, run_salt, creative_mode, recent_direction_ledger)
         prompt1 = assembler_prompt_1(ctx)
         st.session_state.ctx = ctx
         st.session_state.title_effective = ctx.title
         st.session_state.yaourt_text = yaourt
         st.session_state.user_instructions = instructions
+        st.session_state.creative_run_salt = run_salt
+        st.session_state.creative_mode = creative_mode
+        st.session_state.recent_direction_ledger = recent_direction_ledger
         st.session_state.prompt1 = prompt1
         set_step(2)
         st.success(f"Prompt 1 généré — Mode : {ctx.source_mode} · Langue : {ctx.language} · Lignes : {ctx.row_count if ctx.rows else 'structure libre'}")
@@ -438,7 +470,7 @@ if st.session_state.prompt1:
             st.stop()
         ctx = st.session_state.ctx
         if ctx is None:
-            ctx = build_context(st.session_state.title_effective or "TITLE TO BE DETERMINED BY AI", "session_rebuild", st.session_state.user_instructions, st.session_state.yaourt_text)
+            ctx = build_context(st.session_state.title_effective or "TITLE TO BE DETERMINED BY AI", "session_rebuild", st.session_state.user_instructions, st.session_state.yaourt_text, run_salt=st.session_state.get("creative_run_salt", "001"), creative_mode=st.session_state.get("creative_mode", "Explore New Direction"), recent_direction_ledger=st.session_state.get("recent_direction_ledger", ""))
             st.session_state.ctx = ctx
         try:
             prompt2 = assembler_prompt_2(ctx, handoff1)
@@ -489,7 +521,7 @@ if st.session_state.prompt2:
             st.stop()
         ctx = st.session_state.ctx
         if ctx is None:
-            ctx = build_context(st.session_state.title_effective or "TITLE TO BE DETERMINED BY AI", "session_rebuild", st.session_state.user_instructions, st.session_state.yaourt_text)
+            ctx = build_context(st.session_state.title_effective or "TITLE TO BE DETERMINED BY AI", "session_rebuild", st.session_state.user_instructions, st.session_state.yaourt_text, run_salt=st.session_state.get("creative_run_salt", "001"), creative_mode=st.session_state.get("creative_mode", "Explore New Direction"), recent_direction_ledger=st.session_state.get("recent_direction_ledger", ""))
             st.session_state.ctx = ctx
         try:
             prompt3 = assembler_prompt_3(ctx, handoff2)
@@ -614,6 +646,7 @@ with st.expander("Diagnostic avancé / blueprint", expanded=False):
         st.write(f"**Langue :** {ctx.language}")
         st.write(f"**Mode :** {ctx.source_mode}")
         st.write(f"**Nombre de lignes blueprint :** {ctx.row_count if ctx.rows else 'N/A'}")
+        st.text_area("Paquet de divergence créative v8.8", value=getattr(ctx, "creative_coordinates", ""), height=260, label_visibility="collapsed")
         st.text_area("Blueprint complet", value=ctx.blueprint_full, height=260, label_visibility="collapsed")
         st.download_button(
             "Télécharger le blueprint complet",

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Auditeur final CLI optionnel pour ORPHÉE LOCAL v8."""
+"""Auditeur final CLI optionnel pour ORPHÉE LOCAL v9.0."""
 from __future__ import annotations
 import argparse
 from pathlib import Path
-from orphee_core import parse_blueprint_table, audit_final_text, build_correction_prompt
+from orphee_core import parse_blueprint_table, audit_final_text, build_correction_prompt, ORPHEE_VERSION, CORE_FILE_PATH
 
 
 def main() -> int:
@@ -13,6 +13,7 @@ def main() -> int:
     ap.add_argument("--out", default="", help="Fichier rapport à écrire")
     args = ap.parse_args()
 
+    print(f"Moteur actif : {ORPHEE_VERSION} | {CORE_FILE_PATH}")
     blueprint = Path(args.blueprint).read_text(encoding="utf-8")
     final = Path(args.final).read_text(encoding="utf-8")
     rows = parse_blueprint_table(blueprint)

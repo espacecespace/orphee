@@ -71,11 +71,21 @@ If a repair preserves Total and PARTITION but places the strongest/held syllable
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.9 — SCRIPT-COMPUTED STRONG ANCHOR MAP + ATTRACTOR NON-REINTRODUCTION
+CRITICAL v9.0 — SCRIPT-COMPUTED STRONG ANCHOR MAP + ATTRACTOR NON-REINTRODUCTION
 ══════════════════════════════════════════════════════════
 
 Prompt 2 receives a LOCAL STRONG ANCHOR MAP computed by the script.
 Use it. It is not optional commentary.
+
+ANCHOR PROOF TABLE — MANDATORY FOR HIGH-RISK ROWS:
+For every row listed in LOCAL STRONG ANCHOR MAP that is changed, chorus-bearing, partitioned, or repeated, output a compact proof row:
+Row | Critical Slot | Source Word | Final Word | Final Lexical Class | ANCHOR_OK
+If any CONTENT source slot lands on the/a/of/to/for/at/on/out/off or another hard-weak word, ANCHOR_OK = NO and Exact? = NO.
+Do not write Strong Attack Pass? YES without this proof. This is a gate, not a confidence vibe.
+
+NO QUOTE / TITLE LAUNDERING DURING METER LOCK:
+Do not reintroduce a blocked title phrase or default family inside quotes, reported speech, parentheticals, or ironic framing just because it fits the target syllables.
+
 
 For every high-risk row listed in the map:
 1. Identify the final word landing on each listed critical syllable slot.
@@ -192,7 +202,7 @@ NEW v1.0 GUARANTEES:
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.9 — FUNCTIONAL ATTRACTOR NON-INTRODUCTION + DIVERGENCE TRACE PRESERVATION
+CRITICAL v9.0 — FUNCTIONAL ATTRACTOR NON-INTRODUCTION + DIVERGENCE TRACE PRESERVATION
 ══════════════════════════════════════════════════════════
 
 Prompt 2 is not the main creativity engine. Its job is acoustic construction.

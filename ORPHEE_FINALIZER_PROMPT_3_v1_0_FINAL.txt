@@ -12,7 +12,7 @@
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.9 — FUNCTIONAL ATTRACTOR AUDIT / DIVERGENCE TRACE / NO SYNONYM LAUNDERING
+CRITICAL v9.0 — FUNCTIONAL ATTRACTOR AUDIT / DIVERGENCE TRACE / NO SYNONYM LAUNDERING
 ══════════════════════════════════════════════════════════
 
 Prompt 3 must audit not only words, but dramatic functions.
@@ -37,6 +37,13 @@ If the Master Cut returns to a recent or vetoed dramatic family, mark FAIL_QUALI
 
 Do not reward the safest cleanest solution merely because it is singable. Prompt 3 is allowed to approve a strange but precise engine over a familiar perfect-score engine.
 
+V9.0 FRAUD CHECKS BEFORE MASTER CUT:
+- HYDRA GATE: if the lyric avoided the named ledger family but made an adjacent refuge family the hook, mark FAIL_QUALITY and repair.
+- NO QUOTE LAUNDERING: a blocked title phrase remains blocked inside quotation marks or reported speech.
+- THESIS-CHORUS VETO: diagnostic address choruses such as "you assume / you believe / you treat" require repair unless explicitly justified by Handoff 1 and not vetoed.
+- CONCRETE DETAIL CAUSALITY: random specificity is not novelty. Concrete details must alter behavior.
+- ANCHOR PROOF TRACE: if Prompt 2 lacks anchor proof for high-risk rows, do not certify strong-attack risk as NONE.
+
 ATTENTION CONTROL:
 This is a compact quality audit, not a new creative pass.
 Do not rewrite the song merely to avoid a cluster.
@@ -45,7 +52,7 @@ Only repair when the cluster dominates the hook, displaces the Human Pressure En
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.9 — QUALITY GATE IS A BRAKE, NOT A WEATHER REPORT
+CRITICAL v9.0 — QUALITY GATE IS A BRAKE, NOT A WEATHER REPORT
 ══════════════════════════════════════════════════════════
 
 If the final lyric collapses into a vetoed super-attractor family, do not merely mention it.

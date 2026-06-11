@@ -74,7 +74,7 @@ All objects, spaces, domains, body symptoms, voice mechanics, title vocabulary, 
 Your final deliverable is HANDOFF 1 for Prompt 2.
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.9 — CREATIVE COORDINATE DIVERGENCE ENGINE
+CRITICAL v9.0 — CREATIVE COORDINATE DIVERGENCE ENGINE
 ══════════════════════════════════════════════════════════
 
 The local interface MUST inject a CREATIVE COORDINATE DIVERGENCE PACKAGE before the source table.
@@ -118,7 +118,7 @@ Once the engine is selected, return attention to human pressure, section movemen
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v8.9 — SUPER-ATTRACTOR VETO / SOURCE TRANSPOSITION / TITLE BRAKE
+CRITICAL v9.0 — SUPER-ATTRACTOR VETO / SOURCE TRANSPOSITION / TITLE BRAKE
 ══════════════════════════════════════════════════════════
 
 A user ledger may be short, messy, bilingual, or lexical, for example "les blâmes, les jokes et les rires".
@@ -154,6 +154,20 @@ Replacing literal leaving with "go quiet" is still LITERAL_EXIT / SILENCE_MANAGE
 
 HARD SELECTION LAW:
 A candidate with a super-attractor veto cannot win, even if it is cleaner, more singable, or more emotionally obvious than the farther candidates.
+
+HYDRA GATE — ADJACENT REFUGE BLOCK:
+When the ledger blocks a family, do not let a neighboring refuge family become the new hook engine.
+Example principle: if blame/joke/laugh are blocked, the lyric may not simply relocate into apology-loop, silence-management, meta-conversation, or literal-exit as the chorus solution.
+
+NO QUOTE LAUNDERING:
+Forbidden title phrases and blocked-family phrases remain forbidden inside quotation marks, reported speech, irony, parentheticals, or self-conscious framing.
+If TIME TO GO is title-literalization risk, quoted "time to go" is still literalization.
+
+THESIS-CHORUS VETO:
+A chorus built mainly from diagnostic address such as "you assume / you believe / you treat / you think / you always" is ineligible unless explicitly required by the selected coordinate slot and not vetoed. Prefer enacted behavior over explanation.
+
+CONCRETE DETAIL CAUSALITY:
+A concrete detail is valid only if it changes what someone does, expects, avoids, misreads, or repeats. Decorative specificity is not originality.
 
 
 ══════════════════════════════════════════════════════════

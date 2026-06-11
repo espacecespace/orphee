@@ -1,4 +1,4 @@
-# ORPHÉE v8.2 — Version Streamlit Cloud SANS SOUS-DOSSIERS
+# ORPHÉE v9.0 — Version Streamlit Cloud SANS SOUS-DOSSIERS
 
 Cette version est faite pour éviter le cauchemar GitHub des sous-dossiers. Tous les fichiers doivent être téléversés **à la racine** du dépôt GitHub.
 
@@ -47,7 +47,7 @@ ORPHEE_AUDIT_CORRECTION_v1_0.txt
 6. Coller le bloc final pur → audit local + prompt de correction.
 
 
-## v8.3 — Correction du bloc final Prompt 3
+## v9.0 — Correction du bloc final Prompt 3
 
 Le Prompt 3 demande maintenant que le bloc `FINAL HANDOFF — PURE LYRICS ONLY` soit rendu dans un bloc de code `text` pour faciliter la copie.
 L'auditeur accepte maintenant :
@@ -60,11 +60,33 @@ L'auditeur accepte maintenant :
 L'app extrait et normalise automatiquement le bloc final avant l'audit.
 
 
-## Note v8.5 — Virgules et partitions
+## Note v9.0 — Virgules et partitions
 
 L'audit vérifie maintenant explicitement que les partitions internes du blueprint sont respectées. Une ligne avec le bon total syllabique peut être rejetée si elle ne respecte pas les pauses internes issues des virgules, points, tirets ou autres séparateurs du yaourt source. Exemple : `[2] + [14]` n'est pas équivalent à `[16]`. Oui, c'est strict. C'est le but, malheureusement pour les phrases trop propres.
 
 
-## Note v8.5
+## Note v9.0
 
 Ajout du verrou **Strong Attack / Held Note Lock** : les attaques fortes et notes tenues ne doivent pas tomber sur des articles/prépositions faibles lorsque la source portait un mot fort.
+
+## Note v9.0
+
+Les noms de fichiers des gabarits sont inchangés. Cette version ajoute seulement des règles internes : Anchor-First, réparation bornée, verrou anti-ponctuation parasite et prudence de validation locale.
+
+
+## Notes v9.0
+
+- Le script local calcule maintenant un **Creative Coordinate Divergence Package** à partir du titre, du blueprint, de la ligne 7, de la dernière ligne, du nombre de sections, des partitions et des lignes courtes.
+- Prompt 1 utilise ces coordonnées pour générer des moteurs humains plus divergents sans dépendre d'une banlist de mots.
+- Prompt 2 conserve les verrous v9.0 : partition, attaques fortes, no-extra-punctuation, anchor-first et repair borné.
+- Prompt 3 ajoute un audit de fonction dramatique pour éviter le synonym laundering et les attracteurs récurrents.
+- L'auditeur local ajoute un **Attractor Function Report** qualitatif, séparé des erreurs mécaniques.
+
+
+## v9.0
+
+Ajoute un Run Salt, un paquet de divergence créative injecté et visible dans Prompt 1, un veto de familiarité, et un diagnostic du paquet créatif dans l’interface.
+
+
+## Diagnostic v9.0
+L’interface affiche la version active, le chemin réel de `orphee_core.py` et le rapport d’audit commence par `AUDIT ENGINE VERSION: ORPHÉE v9.0 QUALITY GATE`. Si cette ligne est absente, le mauvais moteur tourne.

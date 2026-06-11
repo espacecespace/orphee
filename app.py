@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
+import orphee_core as core_module
 
 from orphee_core import (
     BuildContext,
@@ -26,7 +27,7 @@ from orphee_core import (
     slugify_filename,
 )
 
-APP_VERSION = "v8.9 béton"
+APP_VERSION = "v9.0 béton"
 
 st.set_page_config(
     page_title="ORPHÉE — Générateur guidé",
@@ -318,6 +319,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+st.info(f"Version active : {getattr(core_module, 'ORPHEE_VERSION', 'UNKNOWN')} · Audit : {getattr(core_module, 'AUDIT_ENGINE_LABEL', 'UNKNOWN')} · Core chargé : {getattr(core_module, 'CORE_FILE_PATH', 'UNKNOWN')}")
+
 stepper()
 
 st.markdown(
@@ -357,7 +360,7 @@ instructions = st.text_area(
     key="instructions_box",
 )
 
-st.markdown("#### Divergence créative v8.9")
+st.markdown("#### Divergence créative v9.0")
 col_div1, col_div2 = st.columns([1, 1])
 with col_div1:
     creative_mode = st.selectbox(
@@ -646,7 +649,7 @@ with st.expander("Diagnostic avancé / blueprint", expanded=False):
         st.write(f"**Langue :** {ctx.language}")
         st.write(f"**Mode :** {ctx.source_mode}")
         st.write(f"**Nombre de lignes blueprint :** {ctx.row_count if ctx.rows else 'N/A'}")
-        st.text_area("Paquet de divergence créative v8.8", value=getattr(ctx, "creative_coordinates", ""), height=260, label_visibility="collapsed")
+        st.text_area("Paquet de divergence créative v9.0", value=getattr(ctx, "creative_coordinates", ""), height=260, label_visibility="collapsed")
         st.text_area("Blueprint complet", value=ctx.blueprint_full, height=260, label_visibility="collapsed")
         st.download_button(
             "Télécharger le blueprint complet",

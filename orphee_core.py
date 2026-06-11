@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ORPHÉE v8.9 — Core
+ORPHÉE v9.0 — Core
 ======================
 Fonctions communes pour l'interface Streamlit locale :
 - analyse acoustique du yaourt/source,
@@ -23,6 +23,9 @@ from pathlib import Path
 from typing import Callable, Iterable, Optional
 
 ROOT = Path(__file__).resolve().parent
+ORPHEE_VERSION = "ORPHÉE v9.0"
+AUDIT_ENGINE_LABEL = "ORPHÉE v9.0 QUALITY GATE"
+CORE_FILE_PATH = str(Path(__file__).resolve())
 GABARITS_DIR = ROOT  # Version GitHub simplifiée : gabarits à la racine, aucun sous-dossier
 
 SOURCE_P1_TEMPLATE = "ORPHEE_SOURCE_PROMPT_1_v1_2_FINAL.txt"
@@ -362,7 +365,7 @@ def analyze_yaourt(yaourt: str, analyzer: Optional[Callable[[str], dict]] = None
 
 
 # ============================================================================
-# v8.9 — CREATIVE COORDINATE DIVERGENCE + ATTRACTOR BRAKES
+# v9.0 — CREATIVE COORDINATE DIVERGENCE + ATTRACTOR BRAKES
 # ----------------------------------------------------------------------------
 # Le script local calcule ces coordonnées avant Prompt 1. Le modèle ne les
 # invente pas : il les exécute comme des contraintes de recherche abstraites.
@@ -425,14 +428,14 @@ AXIS_DEFAULT_FUNCTION_TO_AVOID = [
 ATTRACTOR_FUNCTION_CLUSTERS = {
     # Rapport qualité seulement : ces clusters ne bloquent pas mécaniquement.
     "humor-cover-default": [r"\blaugh", r"\bjok", r"\bcough", r"\bfunny\b", r"\bpretend", r"\bmade it weird\b"],
-    "literal-exit-default": [r"\bleav", r"\bgo\b", r"\bdoor\b", r"\bwalk", r"\blate\b", r"\bsleep\b", r"\bplans\b"],
+    "literal-exit-default": [r"\btime to go\b", r"\bleav", r"\bgo\b", r"\bmove\b", r"\bescape\b", r"\bdoor\b", r"\bwalk", r"\baway\b", r"\blate\b", r"\bsleep\b", r"\bplans\b"],
     "apology-loop-default": [r"\bsorry\b", r"\bapolog", r"\bwrong\b", r"\bforgive"],
-    "silence-stretch-default": [r"\bsilence\b", r"\bquiet\b", r"\bpause", r"\blook away\b"],
+    "silence-stretch-default": [r"\bsilence\b", r"\bquiet\b", r"\bpause", r"\brest\b", r"\bcalm\b", r"\bslow\b", r"\bstill\b", r"\blook away\b"],
     "process-metaphor-default": [r"\bsignal", r"\bscript", r"\bloop", r"\bpattern", r"\breset", r"\berase", r"\bfilter"],
 }
 
 
-# v8.9 — familles dramaturgiques profondes. Ce ne sont pas des listes de mots à
+# v9.0 — familles dramaturgiques profondes. Ce ne sont pas des listes de mots à
 # censurer bêtement : ce sont des attracteurs fonctionnels à rendre inéligibles
 # quand le ledger récent ou le titre les rend suspects.
 SUPER_ATTRACTOR_FAMILIES = {
@@ -451,11 +454,11 @@ SUPER_ATTRACTOR_FAMILIES = {
         r"\bmots?\b", r"\bphrase\b", r"\bparle", r"\bdire\b", r"\br[ée]pond",
     ],
     "SILENCE_MANAGEMENT_ENGINE": [
-        r"\bsilence\b", r"\bquiet\b", r"\bpause", r"\bsigh\b", r"\blook away\b",
+        r"\bsilence\b", r"\bquiet\b", r"\bpause", r"\brest\b", r"\bcalm\b", r"\bslow\b", r"\bsigh\b", r"\blook away\b",
         r"\bsilenc", r"\btais", r"\bse taire\b", r"\bsoupir", r"\bpause",
     ],
     "LITERAL_EXIT_ENGINE": [
-        r"\btime to go\b", r"\bgo\b", r"\bleave\b", r"\bdoor\b", r"\bwalk\b", r"\baway\b",
+        r"\btime to go\b", r"\btime\b", r"\bgo\b", r"\bmove\b", r"\bescape\b", r"\bleave\b", r"\bdoor\b", r"\bwalk\b", r"\baway\b",
         r"\bpartir\b", r"\bsortir\b", r"\bporte\b", r"\bd[ée]part", r"\bs'en aller\b",
     ],
     "SOURCE_ECHO_ENGINE": [
@@ -504,22 +507,25 @@ def expand_recent_direction_ledger(raw: str | None, title: str = "") -> str:
         lines.append("\nTITLE-LITERALIZATION RISK:")
         for fam in title_hits:
             lines.append(f"- {fam}: title words belong to this default family. Title phrase must be transposed, not used as obvious hook unless explicitly authorized.")
-    lines.append("\nGLOBAL v8.9 SUPER-ATTRACTOR VETOES:")
+    lines.append("\nGLOBAL v9.0 SUPER-ATTRACTOR + HYDRA VETOES:")
     lines.append("- If a candidate can be summarized as blame/concession, humor-cover, meta-conversation, silence-management, literal-exit, or direct source-echo, it is ineligible when that family appears above or in recent outputs.")
     lines.append("- Generic user wording such as 'les blâmes, les jokes et les rires' expands to BLAME_CONCESSION_ENGINE + HUMOR_COVER_ENGINE, including synonyms and functional equivalents.")
+    lines.append("- HYDRA GATE: when one family is blocked, adjacent refuge families cannot become the chorus/hook engine. Example: blocking blame/jokes/rires also puts silence-management, apology-loop, meta-conversation and literal-exit on high suspicion.")
+    lines.append("- NO QUOTE LAUNDERING: forbidden title/function words remain forbidden inside quotes, reported speech, irony, parentheses, or self-conscious framing.")
     return "\n".join(lines)[:2600]
 
 
 def build_strong_anchor_package(rows: list[BlueprintRow]) -> str:
     if not rows:
-        return """\n══════════════════════════════════════════════════════════\nLOCAL STRONG ANCHOR MAP — v8.9\n══════════════════════════════════════════════════════════\nFREE_STRUCTURE MODE: no local source anchors available.\n""".strip()
+        return """\n══════════════════════════════════════════════════════════\nLOCAL STRONG ANCHOR MAP — v9.0\n══════════════════════════════════════════════════════════\nFREE_STRUCTURE MODE: no local source anchors available.\n""".strip()
     analyzer = load_phonetic_engine()
     lines = [
         "\n══════════════════════════════════════════════════════════",
-        "LOCAL STRONG ANCHOR MAP — v8.9 SCRIPT-COMPUTED / PROMPT 2 MUST USE",
+        "LOCAL STRONG ANCHOR MAP — v9.0 SCRIPT-COMPUTED / PROMPT 2 MUST USE",
         "══════════════════════════════════════════════════════════",
         "This map is computed from the source line + local stress pattern. It does not predict the final line; it marks where Prompt 2 must protect source strong/content slots.",
         "Rule: on listed critical syllable slots, do not place HARD_WEAK words (articles/prepositions/particles such as the/a/of/to/for/at/on/out/off) unless the source slot was also weak.",
+        "ANCHOR SLOT LEXICAL CLASS GATE: source CONTENT -> final CONTENT. If final word is hard-weak on a listed slot, ANCHOR_OK = NO and the row cannot be marked exact.",
         "Rows shown are high-risk: partitioned rows, 8+ syllable rows, chorus/bridge rows, or repeated structures.",
         "If a candidate line cannot satisfy these anchors, mark ANCHOR_OK = NO and repair before Handoff 2. Do not self-certify.",
         "",
@@ -629,7 +635,7 @@ def build_creative_coordinate_package(
 ) -> str:
     """Build a visible, locally computed ideation package.
 
-    v8.8 correction: this package is injected directly into Prompt 1 and must
+    v9.0 correction: this package is injected directly into Prompt 1 and must
     be echoed by the model. It includes a run salt and six precomputed slots.
     """
     analyzer = load_phonetic_engine()
@@ -660,7 +666,7 @@ def build_creative_coordinate_package(
     base = {"c": c_idx, "g": g_idx, "r": r_idx, "s": s_idx, "d": d_idx, "avoid": avoid_idx}
     slots = build_candidate_coordinate_slots(base, salt_shift, mode_shift)
 
-    run_id = f"ORPHEE-v8.9-{checksum % 9973:04d}-{salt_checksum % 7919:04d}-{ledger_checksum % 6841:04d}-{mode}"
+    run_id = f"ORPHEE-v9.0-{checksum % 9973:04d}-{salt_checksum % 7919:04d}-{ledger_checksum % 6841:04d}-{mode}"
 
     source_variables = (
         f"T_title_syllables={title_syll}; R_row_count={row_count}; S_section_count={section_count}; "
@@ -686,7 +692,7 @@ def build_creative_coordinate_package(
 
     return f"""
 ══════════════════════════════════════════════════════════
-CREATIVE COORDINATE DIVERGENCE PACKAGE — v8.9 LOCAL-COMPUTED / MUST-ECHO
+CREATIVE COORDINATE DIVERGENCE PACKAGE — v9.0 LOCAL-COMPUTED / MUST-ECHO
 ══════════════════════════════════════════════════════════
 RUN_ID: {run_id}
 CREATIVE_MODE: {mode}
@@ -727,6 +733,10 @@ EXECUTION RULES:
 10. SUPER-ATTRACTOR VETO: if a candidate is built around a blocked family in the expanded ledger, it is ineligible even if the exact blocked words never appear.
 11. SOURCE SEMANTIC TRANSPOSITION: preserve rhythmic / relational pressure from the source, but do not preserve its obvious semantic field as the final concept unless explicitly authorized.
 12. TITLE-LITERALIZATION BRAKE: if the title is classified as a default family, do not use its literal phrase as chorus/hook engine; transpose it into behavioral pressure.
+13. NO QUOTE LAUNDERING: a title phrase or blocked-family phrase remains blocked inside quotation marks, dialogue, irony, reported speech, parentheticals, or self-conscious framing.
+14. HYDRA GATE: when a user ledger blocks one family, adjacent refuge families are also ineligible as chorus/hook engines if they become the replacement solution.
+15. THESIS-CHORUS VETO: if the chorus mainly diagnoses the other person using patterns like you assume / you believe / you treat / you think / you always, rebuild it as behavior instead of explanation.
+16. CONCRETE DETAIL CAUSALITY: any concrete detail must change an action, expectation, avoidance, misreading, or repeated behavior. Decorative specificity fails.
 
 MODE RULE:
 {mode_rule}
@@ -745,7 +755,7 @@ This coordinate package governs ideation only, but its vetoes remain active thro
 
 def lexical_attractor_report(lyric_lines: list[str]) -> tuple[list[str], int]:
     text = "\n".join(lyric_lines).lower()
-    lines = ["\n4. ATTRACTOR FUNCTION REPORT — v8.9 QUALITY GATE"]
+    lines = ["\n4. ATTRACTOR FUNCTION REPORT — v9.0 QUALITY GATE"]
     any_hit = False
     quality_fail = 0
     # Surface clusters from previous versions.
@@ -775,9 +785,27 @@ def lexical_attractor_report(lyric_lines: list[str]) -> tuple[list[str], int]:
         elif count >= 3:
             any_hit = True
             lines.append(f"WATCH | {family} | functional presence≈{count} | monitor for dominance")
+    # v9.0 special fraud detectors: quote laundering, thesis chorus, decorative specificity refuges.
+    quote_launder_hits = len(re.findall(r'["“”][^"“”]{0,80}\b(?:time to go|go|leave|move|escape|quiet|silence|pause|joke|laugh|blame|wrong)\b[^"“”]{0,80}["“”]', text, flags=re.I))
+    if quote_launder_hits:
+        any_hit = True
+        quality_fail += 1
+        lines.append(f"FAIL-QUALITY | quote-laundering | occurrences≈{quote_launder_hits} | blocked function placed inside quotes/reported speech")
+    thesis_hits = len(re.findall(r'\byou\s+(?:assume|believe|treat|think|always|decide)\b', text, flags=re.I))
+    if thesis_hits >= 3:
+        any_hit = True
+        quality_fail += 1
+        lines.append(f"FAIL-QUALITY | thesis-address-chorus | occurrences≈{thesis_hits} | chorus likely diagnoses instead of dramatizing behavior")
+    elif thesis_hits:
+        any_hit = True
+        lines.append(f"WATCH | thesis-address-chorus | occurrences≈{thesis_hits} | monitor explanatory address")
+    decorative_hits = len(re.findall(r'\b(?:tuesday|sunday|monday|grass|score|rule|grades?)\b', text, flags=re.I))
+    if decorative_hits >= 3:
+        any_hit = True
+        lines.append(f"WATCH | decorative-specificity-risk | occurrences≈{decorative_hits} | concrete detail must cause behavior, not merely decorate")
     if not any_hit:
         lines.append("✅ No obvious default-function cluster dominance detected.")
-    lines.append("NOTE : v8.9 treats FAIL-QUALITY as a quality gate. It is not a syllable/partition failure, but it blocks a final-ready status because the lyric has collapsed into a default dramatic family.")
+    lines.append("NOTE : v9.0 treats FAIL-QUALITY as a QUALITY GATE. It is not a syllable/partition failure, but it blocks final-ready status because the lyric collapsed into a default dramatic family or laundering tactic.")
     return lines, quality_fail
 
 def detect_source_mode(yaourt: str, title: str, instructions: str) -> str:
@@ -1034,6 +1062,10 @@ def audit_final_text(final_text: str, blueprint_rows: list[BlueprintRow]) -> tup
 
     report.append("RAPPORT D’AUDIT FINAL ORPHÉE")
     report.append("=" * 64)
+    report.append(f"AUDIT ENGINE VERSION: {AUDIT_ENGINE_LABEL}")
+    report.append(f"CORE FILE LOADED: {CORE_FILE_PATH}")
+    report.append("QUALITY REPORT MODE: FAIL-QUALITY BLOCKS FINAL READINESS")
+    report.append("")
 
     if not blueprint_rows:
         report.append("MODE AUDIT LÉGER — aucun blueprint strict disponible.")

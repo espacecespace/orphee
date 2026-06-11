@@ -1,0 +1,38 @@
+Tu as généré le dernier Master Cut ORPHÉE.
+
+Voici un audit local indépendant basé sur le blueprint acoustique source. Tu dois corriger uniquement les lignes rejetées ou marquées comme avertissements critiques.
+
+RÈGLES DE CORRECTION NON NÉGOCIABLES
+- Ne change aucune ligne conforme, sauf si elle est explicitement listée dans les erreurs à corriger.
+- Ne change pas les titres de sections.
+- Ne change pas le nombre de lignes.
+- Ne fusionne aucune ligne.
+- Ne divise aucune ligne.
+- Préserve le moteur humain, les hooks fonctionnels et les lignes protégées du dernier Handoff.
+- Si une ligne est corrigée, elle doit respecter exactement la cible de syllabes ET la partition demandée.
+- La partition est obligatoire : [2] + [14] n'est pas équivalent à [16].
+- Les virgules / pauses internes du blueprint sont des contraintes musicales, pas de la ponctuation décorative.
+- Les attaques fortes / notes tenues sont obligatoires : ne place pas une attaque forte source sur un article, une préposition ou un mot faible comme "the", "of", "to", "for", sauf si la source faisait déjà cela.
+- Répare en mode ANCHOR-FIRST : place d’abord des mots porteurs sur les attaques fortes, puis remplis les syllabes faibles.
+- Une ligne qui respecte le total et la partition peut quand même être rejetée si le mot porté par la note forte est musicalement faible.
+- N’ajoute aucun segment parasite : pas de virgule, tiret, point-virgule, deux-points, point, point d’interrogation, point d’exclamation ou mot composé avec trait d’union qui transforme la partition cible.
+- Exemple : [2] + [14] ne doit pas devenir [2] + [6] + [8].
+- Exemple : [2] + [14] ne doit pas devenir [2] + [12] + [2] à cause d’un mot composé avec trait d’union.
+- Maximum deux tentatives locales par ligne. Si tu ne peux pas corriger sans casser le texte, donne la meilleure version et indique LOCAL_AUDIT_NEEDED dans le rapport, mais le bloc final doit rester pur.
+- Retourne uniquement le bloc final pur, sans titre, sans commentaire, sans tableau.
+- Tu peux utiliser une boîte ```text``` uniquement si l'interface l'exige, mais le contenu interne doit rester pur.
+
+FORMAT DE SORTIE OBLIGATOIRE
+[SECTION] #n
+ligne
+ligne
+
+[SECTION] #n
+ligne
+ligne
+
+AUDIT LOCAL À APPLIQUER
+{{AUDIT_REPORT}}
+
+TEXTE FINAL ACTUEL À CORRIGER
+{{FINAL_TEXT}}

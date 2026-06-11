@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ORPHÉE LOCAL v8 — Core
+ORPHÉE v8.5 — Core
 ======================
 Fonctions communes pour l'interface Streamlit locale :
 - analyse acoustique du yaourt/source,
@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Callable, Iterable, Optional
 
 ROOT = Path(__file__).resolve().parent
-GABARITS_DIR = ROOT / "gabarits"
+GABARITS_DIR = ROOT  # Version GitHub simplifiée : gabarits à la racine, aucun sous-dossier
 
 SOURCE_P1_TEMPLATE = "ORPHEE_SOURCE_PROMPT_1_v1_2_FINAL.txt"
 TOPLINER_P2_TEMPLATE = "ORPHEE_TOPLINER_PROMPT_2_v1_0_FINAL.txt"
@@ -35,6 +35,24 @@ BLUEPRINT_ZONE_RE = re.compile(r"°#b#°0°.*?°#b#°9°", re.DOTALL)
 HANDOFF_ZONE_RE = re.compile(r"°#h#°0°.*?°#h#°9°", re.DOTALL)
 SECTION_TAG_RE = re.compile(r"^\s*\[([A-Za-zÀ-ÿ0-9 _\-]+)\](?:\s*#\s*(\d+))?\s*$")
 INLINE_COMMENT_RE = re.compile(r"\(.*?\)")
+
+
+# Mots faibles à éviter sur une attaque forte / note tenue.
+# Ce n'est pas une grammaire parfaite, c'est un garde-fou musical local.
+HARD_WEAK_ATTACK_WORDS = {
+    "the", "a", "an", "of", "to", "for", "from", "in", "on", "at", "by", "as",
+    "than", "with", "into", "onto", "over", "under", "through", "about", "around",
+    "per", "via", "up", "out", "off",
+}
+SOFT_WEAK_ATTACK_WORDS = {
+    "am", "is", "are", "was", "were", "be", "been", "being",
+    "do", "does", "did", "have", "has", "had",
+    "will", "would", "can", "could", "should", "may", "might", "must",
+    "i", "you", "he", "she", "we", "they", "it", "me", "him", "her", "us", "them",
+    "my", "your", "his", "its", "our", "their", "that", "this", "these", "those",
+    "and", "or", "but", "if", "so", "yet",
+}
+WORD_RE = re.compile(r"[A-Za-zÀ-ÿ']+")
 
 TITLE_PLACEHOLDERS = [
     "[TITRE_DE_LA_CHANSON_AUTOMATIQUE]",
@@ -106,7 +124,7 @@ def load_text(path: Path) -> str:
 def load_template(name: str) -> str:
     path = GABARITS_DIR / name
     if not path.is_file():
-        raise FileNotFoundError(f"Gabarit introuvable : {path}")
+        raise FileNotFoundError(f"Gabarit introuvable : {path}. Dans la version FLAT, tous les fichiers .txt de gabarit doivent être à la racine du repo, à côté de app.py.")
     return load_text(path)
 
 
@@ -222,6 +240,84 @@ def analyze_line(line: str, analyzer: Callable[[str], dict]) -> tuple[str, int, 
 
     return " + ".join(partitions) if partitions else "[0]", total, " / ".join(stresses), end_rhyme or "-"
 
+
+
+
+def flatten_stress_pattern(pattern: str) -> list[str]:
+    """Retourne une liste de DUM/da, sans les séparateurs de segments."""
+    return re.findall(r"\b(?:DUM|da)\b", pattern or "")
+
+
+def classify_attack_word(word: str) -> str:
+    w = word.lower().strip("'’`.,;:!?()[]{}\"")
+    if w in HARD_WEAK_ATTACK_WORDS:
+        return "HARD_WEAK"
+    if w in SOFT_WEAK_ATTACK_WORDS or w.endswith("n't") or w.endswith("'s") or w.endswith("'d") or w.endswith("'ll"):
+        return "SOFT_WEAK"
+    return "CONTENT"
+
+
+def syllable_word_profile(line: str, analyzer: Callable[[str], dict]) -> list[dict]:
+    """
+    Approxime l'alignement syllabe -> mot.
+    Sert à repérer les attaques fortes placées sur des mots faibles.
+    """
+    clean = INLINE_COMMENT_RE.sub("", line).strip() or line.strip()
+    profile: list[dict] = []
+    for match in WORD_RE.finditer(clean):
+        word = match.group(0)
+        try:
+            adn = analyzer(word) or {}
+            count = int(adn.get("count") or 0)
+        except Exception:
+            count = 0
+        if count <= 0:
+            count = 1
+        stress_tokens = flatten_stress_pattern(str((adn or {}).get("stress_pattern") or ""))
+        if len(stress_tokens) < count:
+            # Fallback conservateur : contenu = première syllabe forte, fonction = faible.
+            default = "DUM" if classify_attack_word(word) == "CONTENT" else "da"
+            stress_tokens = stress_tokens + [default] * (count - len(stress_tokens))
+        for syll_idx in range(count):
+            profile.append({
+                "word": word,
+                "class": classify_attack_word(word),
+                "word_syllable_index": syll_idx + 1,
+                "stress": stress_tokens[syll_idx] if syll_idx < len(stress_tokens) else "",
+            })
+    return profile
+
+
+def audit_strong_attack_alignment(row: BlueprintRow, candidate_line: str, analyzer: Callable[[str], dict]) -> tuple[list[str], list[str]]:
+    """
+    Détecte les attaques fortes / syllabes porteuses mal remplacées.
+    Exemple rejeté : source 'Lo-' sur DUM -> candidat 'The' sur la même position.
+    Retourne (erreurs_fatales, avertissements).
+    """
+    target_stress = flatten_stress_pattern(row.stress)
+    if not target_stress:
+        return [], []
+    source_profile = syllable_word_profile(row.source_line, analyzer)
+    cand_profile = syllable_word_profile(candidate_line, analyzer)
+    n = min(len(target_stress), len(source_profile), len(cand_profile))
+    errors: list[str] = []
+    warnings: list[str] = []
+    for pos in range(n):
+        if target_stress[pos] != "DUM":
+            continue
+        src = source_profile[pos]
+        cand = cand_profile[pos]
+        # Attaque forte source porteuse remplacée par article/préposition faible : fail local.
+        if src["class"] == "CONTENT" and cand["class"] == "HARD_WEAK":
+            errors.append(
+                f"syllabe {pos+1}: attaque forte source '{src['word']}' remplacée par mot faible '{cand['word']}'"
+            )
+        # Moins fatal, mais musicalement suspect : auxiliaire/pronom/conjonction sur position forte.
+        elif src["class"] == "CONTENT" and cand["class"] == "SOFT_WEAK" and cand.get("stress") == "da":
+            warnings.append(
+                f"syllabe {pos+1}: attaque forte source '{src['word']}' tombe sur mot faible/peu porteur '{cand['word']}'"
+            )
+    return errors, warnings
 
 def analyze_yaourt(yaourt: str, analyzer: Optional[Callable[[str], dict]] = None) -> tuple[str, str, str, list[BlueprintRow], list[str]]:
     analyzer = analyzer or load_phonetic_engine()
@@ -428,31 +524,73 @@ def expected_section_tags(rows: list[BlueprintRow]) -> list[str]:
     return tags
 
 
+def format_pure_lyrics_block(text: str) -> str:
+    """Normalise l'affichage du bloc final : une ligne vide avant chaque nouvelle section."""
+    out: list[str] = []
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        if is_section_tag(line)[0]:
+            if out and out[-1] != "":
+                out.append("")
+            out.append(line)
+        else:
+            out.append(line)
+    return "\n".join(out).strip()
+
+
 def extract_final_pure_lyrics(model_output: str) -> str:
+    """Extrait un bloc paroles pur depuis une sortie complète Prompt 3 ou un bloc déjà pur.
+
+    Robuste aux variantes fréquentes :
+    - heading FINAL HANDOFF — PURE LYRICS ONLY;
+    - bloc ```text ... ```;
+    - absence de lignes vides entre sections;
+    - sortie complète collée par erreur dans la boîte d'audit.
+    """
     marker = "FINAL HANDOFF — PURE LYRICS ONLY"
-    if marker in model_output:
-        tail = model_output.split(marker, 1)[1]
+    text = model_output.strip()
+
+    if marker in text:
+        tail = text.split(marker, 1)[1].strip()
     else:
         # fallback : commence à la première balise section plausible.
-        m = re.search(r"(?m)^\s*\[[A-Za-zÀ-ÿ0-9 _\-]+\](?:\s*#\s*\d+)?\s*$", model_output)
-        tail = model_output[m.start():] if m else model_output
-    lines = []
+        m = re.search(r"(?m)^\s*\[[A-Za-zÀ-ÿ0-9 _\-]+\](?:\s*#\s*\d+)?\s*$", text)
+        tail = text[m.start():] if m else text
+
+    # Si un bloc de code suit le heading, ne prendre que son contenu.
+    fence = re.search(r"```(?:text|txt|lyrics|markdown)?\s*\n(.*?)\n```", tail, flags=re.S | re.I)
+    if fence:
+        tail = fence.group(1).strip()
+
+    lines: list[str] = []
+    started = False
     for raw in tail.splitlines():
         line = raw.strip()
         if not line:
-            if lines and lines[-1] != "":
-                lines.append("")
             continue
-        # stop if a later audit-ish heading appears after we started collecting
-        if lines and re.match(r"^[A-Z0-9 —/_-]{10,}$", line) and not is_section_tag(line)[0]:
-            break
         if line.startswith("```"):
             continue
+        is_tag, _ = is_section_tag(line)
+        if is_tag:
+            started = True
+            lines.append(line)
+            continue
+        if not started:
+            # Ignore petites lignes décoratives après le marker avant la première section.
+            continue
+        # Stopper si un bloc d'audit reprend après le handoff pur.
+        if re.match(r"^(SECTION\s+\d+|={5,}|</studio_session>|FINAL STATUS|RAPPORT|MASTER CUT|CHANGELOG)\b", line, flags=re.I):
+            break
         lines.append(line)
-    return "\n".join(lines).strip()
+
+    return format_pure_lyrics_block("\n".join(lines))
 
 
 def audit_final_text(final_text: str, blueprint_rows: list[BlueprintRow]) -> tuple[str, list[AuditIssue]]:
+    # Accepte une sortie complète Prompt 3 OU un bloc pur.
+    final_text = extract_final_pure_lyrics(final_text)
     tags, lyric_lines, parasites = parse_pure_lyrics(final_text)
     issues: list[AuditIssue] = []
     report: list[str] = []
@@ -501,9 +639,12 @@ def audit_final_text(final_text: str, blueprint_rows: list[BlueprintRow]) -> tup
     else:
         report.append("✅ Nombre de lignes : CONFORME")
 
-    report.append("\n2. MÉTRIQUE / PARTITION")
+    report.append("\n2. MÉTRIQUE / PARTITION / ATTAQUES FORTES")
+    report.append("NOTE : la partition est une contrainte dure. Exemple : [2] + [14] ≠ [16], même si le total syllabique est identique.")
+    report.append("NOTE : les attaques fortes sont aussi musicales. Une position forte/tenue ne doit pas être déplacée sur un article ou une préposition faible si la source portait un vrai mot.")
     limit = min(len(lyric_lines), len(blueprint_rows))
     fatal_metric = 0
+    fatal_attack = 0
     warnings = 0
     for i in range(limit):
         row = blueprint_rows[i]
@@ -511,19 +652,28 @@ def audit_final_text(final_text: str, blueprint_rows: list[BlueprintRow]) -> tup
         partition, total, stress, rhyme = analyze_line(line, analyzer)
         total_ok = total == row.total
         partition_ok = partition == row.partition
-        if total_ok and partition_ok:
+        attack_errors, attack_warnings = audit_strong_attack_alignment(row, line, analyzer)
+        if total_ok and partition_ok and not attack_errors:
             report.append(f"✅ Row {row.row_id:03d} | {row.section} | OK | {line}")
         else:
-            fatal_metric += 1
-            msg = f"Row {row.row_id}: métrique rejetée."
-            issues.append(AuditIssue("ERROR", row.row_id, row.section, msg, current_line=line, expected=f"{row.partition} / {row.total}", observed=f"{partition} / {total}"))
+            if not (total_ok and partition_ok):
+                fatal_metric += 1
+            if attack_errors:
+                fatal_attack += len(attack_errors)
+            msg = f"Row {row.row_id}: métrique / partition / attaque rejetée."
+            issues.append(AuditIssue("ERROR", row.row_id, row.section, msg, current_line=line, expected=f"{row.partition} / {row.total} / attaques fortes porteuses", observed=f"{partition} / {total}"))
             report.append(f"❌ Row {row.row_id:03d} | {row.section}")
             report.append(f"   TEXTE   : {line}")
             report.append(f"   CIBLE   : {row.partition} ({row.total})")
             report.append(f"   OBTENU  : {partition} ({total})")
+            for ae in attack_errors:
+                report.append(f"   ❌ ATTAQUE FORTE : {ae}")
         if stress and row.stress and stress != row.stress:
             warnings += 1
             report.append(f"   ⚠️ Rythme cible: {row.stress} | obtenu: {stress}")
+        for aw in attack_warnings:
+            warnings += 1
+            report.append(f"   ⚠️ Attaque forte à surveiller : {aw}")
         if rhyme and row.rhyme and row.rhyme != "-" and rhyme != row.rhyme:
             warnings += 1
             report.append(f"   ⚠️ Rime cible: {row.rhyme} | obtenue: {rhyme}")
@@ -531,7 +681,8 @@ def audit_final_text(final_text: str, blueprint_rows: list[BlueprintRow]) -> tup
     report.append("\n3. BILAN")
     report.append(f"Erreurs structurelles/métriques : {len([x for x in issues if x.severity == 'ERROR'])}")
     report.append(f"Erreurs métriques fatales       : {fatal_metric}")
-    report.append(f"Avertissements rythme/rime      : {warnings}")
+    report.append(f"Erreurs attaques fortes fatales : {fatal_attack}")
+    report.append(f"Avertissements rythme/rime/attaque : {warnings}")
     report.append("STATUT FINAL : " + ("✅ CONFORME" if not issues else "❌ CORRECTION REQUISE"))
     return "\n".join(report), issues
 

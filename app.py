@@ -512,7 +512,7 @@ if st.session_state.prompt2:
             download_suffix="PROMPT_3_FINALIZER_v1_0",
             guidance=(
                 "<b>Prompt 3 copié.</b><br>Collez-le dans le chat de votre agent IA. "
-                "À la fin, récupérez le bloc <b>FINAL HANDOFF — PURE LYRICS ONLY</b>, puis revenez ici pour l’auditer à l’étape 4."
+                "À la fin, copiez le bloc <b>FINAL HANDOFF — PURE LYRICS ONLY</b> s’il apparaît seul. Si l’agent vous renvoie toute la sortie, collez-la quand même à l’étape 4 : l’app extraira le bloc pur automatiquement."
             ),
         )
 else:
@@ -527,11 +527,11 @@ if st.session_state.prompt3:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown("### 4. Auditer le texte final")
     st.markdown(
-        '<p class="small-muted">Collez uniquement le bloc final pur : sections entre crochets, lignes de paroles, aucun titre ni commentaire.</p>',
+        '<p class="small-muted">Collez le bloc final pur OU toute la sortie Prompt 3. L’app extrait automatiquement le bloc “FINAL HANDOFF — PURE LYRICS ONLY”, même sans lignes vides entre les sections.</p>',
         unsafe_allow_html=True,
     )
 
-    with st.expander("J’ai une sortie complète Prompt 3, pas seulement le bloc pur"):
+    with st.expander("Option : extraire manuellement depuis une sortie complète Prompt 3"):
         full_output = st.text_area(
             "Sortie complète Prompt 3",
             height=230,
@@ -540,7 +540,7 @@ if st.session_state.prompt3:
         )
         if st.button("Extraire le bloc pur depuis cette sortie", use_container_width=True, key="extract_pure"):
             st.session_state.final_pure = extract_final_pure_lyrics(full_output)
-            st.success("Bloc pur extrait. Vérifiez-le dans la boîte d’audit ci-dessous.")
+            st.success("Bloc pur extrait et normalisé. Vérifiez-le dans la boîte d’audit ci-dessous.")
 
     final_text = st.text_area(
         "Texte final pur",
@@ -557,9 +557,10 @@ if st.session_state.prompt3:
             st.error("Collez le texte final pur avant de lancer l’audit.")
             st.stop()
         try:
-            report, issues = audit_final_text(final_text, rows)
-            correction = build_correction_prompt(report, final_text)
-            st.session_state.final_pure = final_text
+            clean_final_text = extract_final_pure_lyrics(final_text)
+            report, issues = audit_final_text(clean_final_text, rows)
+            correction = build_correction_prompt(report, clean_final_text)
+            st.session_state.final_pure = clean_final_text
             st.session_state.audit_report = report
             st.session_state.correction_prompt = correction
             if issues:

@@ -1,4 +1,0 @@
-streamlit>=1.35.0
-g2p_en
-nltk
-numpy

@@ -20,6 +20,8 @@ from orphee_core import (
     assembler_prompt_2,
     assembler_prompt_3,
     audit_final_text,
+    audit_handoff1_foundation_gate,
+    audit_handoff2_quality_gate,
     build_context,
     build_correction_prompt,
     extract_final_pure_lyrics,
@@ -27,7 +29,7 @@ from orphee_core import (
     slugify_filename,
 )
 
-APP_VERSION = "v9.0 béton"
+APP_VERSION = "v10.0 Candidate-Gated"
 
 st.set_page_config(
     page_title="ORPHÉE — Générateur guidé",
@@ -133,6 +135,8 @@ def init_state() -> None:
         "final_pure": "",
         "audit_report": "",
         "correction_prompt": "",
+        "foundation_gate_report": "",
+        "handoff2_quality_report": "",
         "reached_step": 1,
         "links": [
             {"label": "ChatGPT", "url": "https://chat.openai.com"},
@@ -360,7 +364,7 @@ instructions = st.text_area(
     key="instructions_box",
 )
 
-st.markdown("#### Divergence créative v9.0")
+st.markdown("#### Divergence créative v10.0")
 col_div1, col_div2 = st.columns([1, 1])
 with col_div1:
     creative_mode = st.selectbox(
@@ -476,15 +480,25 @@ if st.session_state.prompt1:
             ctx = build_context(st.session_state.title_effective or "TITLE TO BE DETERMINED BY AI", "session_rebuild", st.session_state.user_instructions, st.session_state.yaourt_text, run_salt=st.session_state.get("creative_run_salt", "001"), creative_mode=st.session_state.get("creative_mode", "Explore New Direction"), recent_direction_ledger=st.session_state.get("recent_direction_ledger", ""))
             st.session_state.ctx = ctx
         try:
+            gate_report, gate_issues = audit_handoff1_foundation_gate(handoff1, ctx)
+            st.session_state.foundation_gate_report = gate_report
+            if gate_issues:
+                st.error("Fondation bloquée par le Candidate Gate v10. Prompt 2 non généré.")
+                st.text_area("Rapport Foundation Gate", value=gate_report, height=260)
+                st.stop()
             prompt2 = assembler_prompt_2(ctx, handoff1)
             st.session_state.handoff1 = handoff1
             st.session_state.prompt2 = prompt2
             set_step(3)
-            st.success("Prompt 2 généré.")
+            st.success("Prompt 2 généré. Foundation Gate v10 : PASS.")
         except Exception as exc:
             st.error(f"Erreur pendant la génération du Prompt 2 : {exc}")
             st.exception(exc)
     st.markdown('</div>', unsafe_allow_html=True)
+
+    if st.session_state.get("foundation_gate_report"):
+        with st.expander("Rapport Foundation Gate v10", expanded=False):
+            st.text_area("Foundation Gate", value=st.session_state.foundation_gate_report, height=220, disabled=True)
 
     if st.session_state.prompt2:
         result_box(
@@ -527,15 +541,25 @@ if st.session_state.prompt2:
             ctx = build_context(st.session_state.title_effective or "TITLE TO BE DETERMINED BY AI", "session_rebuild", st.session_state.user_instructions, st.session_state.yaourt_text, run_salt=st.session_state.get("creative_run_salt", "001"), creative_mode=st.session_state.get("creative_mode", "Explore New Direction"), recent_direction_ledger=st.session_state.get("recent_direction_ledger", ""))
             st.session_state.ctx = ctx
         try:
+            h2_report, h2_issues = audit_handoff2_quality_gate(handoff2, ctx)
+            st.session_state.handoff2_quality_report = h2_report
+            if h2_issues:
+                st.error("Handoff 2 bloqué par le Quality Gate v10. Prompt 3 non généré.")
+                st.text_area("Rapport Handoff 2 Quality Gate", value=h2_report, height=260)
+                st.stop()
             prompt3 = assembler_prompt_3(ctx, handoff2)
             st.session_state.handoff2 = handoff2
             st.session_state.prompt3 = prompt3
             set_step(4)
-            st.success("Prompt 3 généré.")
+            st.success("Prompt 3 généré. Handoff 2 Quality Gate v10 : PASS.")
         except Exception as exc:
             st.error(f"Erreur pendant la génération du Prompt 3 : {exc}")
             st.exception(exc)
     st.markdown('</div>', unsafe_allow_html=True)
+
+    if st.session_state.get("handoff2_quality_report"):
+        with st.expander("Rapport Handoff 2 Quality Gate v10", expanded=False):
+            st.text_area("Handoff 2 Quality Gate", value=st.session_state.handoff2_quality_report, height=220, disabled=True)
 
     if st.session_state.prompt3:
         result_box(

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-ORPHÉE v9.0 — Core
+ORPHÉE v10.0 — Core
 ======================
 Fonctions communes pour l'interface Streamlit locale :
 - analyse acoustique du yaourt/source,
@@ -23,8 +23,8 @@ from pathlib import Path
 from typing import Callable, Iterable, Optional
 
 ROOT = Path(__file__).resolve().parent
-ORPHEE_VERSION = "ORPHÉE v9.0"
-AUDIT_ENGINE_LABEL = "ORPHÉE v9.0 QUALITY GATE"
+ORPHEE_VERSION = "ORPHÉE v10.0"
+AUDIT_ENGINE_LABEL = "ORPHÉE v10.0 CANDIDATE + QUALITY GATE"
 CORE_FILE_PATH = str(Path(__file__).resolve())
 GABARITS_DIR = ROOT  # Version GitHub simplifiée : gabarits à la racine, aucun sous-dossier
 
@@ -459,7 +459,7 @@ SUPER_ATTRACTOR_FAMILIES = {
     ],
     "LITERAL_EXIT_ENGINE": [
         r"\btime to go\b", r"\btime\b", r"\bgo\b", r"\bmove\b", r"\bescape\b", r"\bleave\b", r"\bdoor\b", r"\bwalk\b", r"\baway\b",
-        r"\bpartir\b", r"\bsortir\b", r"\bporte\b", r"\bd[ée]part", r"\bs'en aller\b",
+        r"\bpartir\b", r"\bsortir\b", r"\bporte\b", r"\bd[ée]part\b", r"\bs'en aller\b",
     ],
     "SOURCE_ECHO_ENGINE": [
         r"\bside\b", r"\breason\b", r"\bfun\b", r"\bfade\b", r"\blonger\b",
@@ -609,7 +609,7 @@ def compact_ledger(text: str | None) -> str:
 def build_candidate_coordinate_slots(base: dict, salt_shift: int, mode_shift: int) -> list[dict]:
     slots: list[dict] = []
     # Coefficients deliberately rotate the six-axis grid so each slot differs.
-    for k in range(6):
+    for k in range(8):
         slots.append({
             "slot": chr(ord('A') + k),
             "contradiction": AXIS_CONTRADICTION[(base["c"] + k * 1 + salt_shift) % 6],
@@ -717,12 +717,12 @@ BASE COORDINATES:
 - TITLE_DISPLACEMENT_AXIS[{d_idx}]: {AXIS_TITLE_DISPLACEMENT[d_idx]}
 - DEFAULT_FUNCTION_TO_AVOID[{avoid_idx}]: {AXIS_DEFAULT_FUNCTION_TO_AVOID[avoid_idx]}
 
-PRECOMPUTED CANDIDATE COORDINATE SLOTS:
+PRECOMPUTED CANDIDATE COORDINATE SLOTS (8 REQUIRED CANDIDATES):
 {chr(10).join(slot_lines)}
 
 EXECUTION RULES:
 1. In Section 3, echo RUN_ID, CREATIVE_MODE, RUN_SALT, the BASE COORDINATES, and all six SLOT labels.
-2. In A(-1), generate exactly one Human Pressure Angle from each SLOT A-F.
+2. In A(-1), generate exactly one Human Pressure Angle from each SLOT A-H, then expose the required v10 Candidate Pool and Selected Foundation Gate blocks.
 3. No candidate may win if it repeats the RECENT DIRECTION EXCLUSION LEDGER, even if it scores highest on singability.
 4. Apply FAMILIARITY VETO before scoring: familiar-but-clean cannot win.
 5. If CREATIVE_MODE = FAR, the safest obvious source-level reading must lose unless every farther candidate breaks source grammar.
@@ -740,6 +740,13 @@ EXECUTION RULES:
 
 MODE RULE:
 {mode_rule}
+
+V10 CANDIDATE-GATED EXECUTION:
+- You must output FOUNDATION CANDIDATE POOL — v10 with exactly 8 candidates C1-C8.
+- You must output LOCAL RERANKING TABLE — v10.
+- You must output FOUNDATION GATE OUTPUT — SELECTED CANDIDATE using exact field names.
+- If no candidate passes, output FOUNDATION_POOL_FAILED and stop before Rough Cut.
+- The local app will block Prompt 2 if the selected gate block is missing or hits blocked/refuge families.
 
 LEXICAL RESERVOIR REQUIREMENT:
 After selecting the engine, create a song-specific lexical reservoir:
@@ -807,6 +814,207 @@ def lexical_attractor_report(lyric_lines: list[str]) -> tuple[list[str], int]:
         lines.append("✅ No obvious default-function cluster dominance detected.")
     lines.append("NOTE : v9.0 treats FAIL-QUALITY as a QUALITY GATE. It is not a syllable/partition failure, but it blocks final-ready status because the lyric collapsed into a default dramatic family or laundering tactic.")
     return lines, quality_fail
+
+
+# ============================================================================
+# v10.0 — CANDIDATE-GATED ARCHITECTURE / LOCAL PRE-FLIGHT GATES
+# ----------------------------------------------------------------------------
+# Les agents IA n'ont plus seulement instruction d'éviter les attracteurs :
+# ils doivent produire une fondation sélectionnée dans un bloc machine-readable.
+# L'application bloque Prompt 2 si le Handoff 1 n'expose pas un candidat PASS.
+# ============================================================================
+
+FOUNDATION_GATE_HEADER = "FOUNDATION GATE OUTPUT — SELECTED CANDIDATE"
+FOUNDATION_POOL_HEADER = "FOUNDATION CANDIDATE POOL — v10"
+HANDOFF2_GATE_HEADER = "HANDOFF 2 QUALITY PREFLIGHT — v10"
+
+V10_REFUGE_FAMILY_GRAPH = {
+    "BLAME_CONCESSION_ENGINE": ["APOLOGY_LOOP_ENGINE", "META_CONVERSATION_ENGINE", "SILENCE_MANAGEMENT_ENGINE", "LITERAL_EXIT_ENGINE"],
+    "HUMOR_COVER_ENGINE": ["PRETEND_COVER_ENGINE", "META_CONVERSATION_ENGINE", "SILENCE_MANAGEMENT_ENGINE", "LITERAL_EXIT_ENGINE"],
+    "LITERAL_EXIT_ENGINE": ["SILENCE_MANAGEMENT_ENGINE", "META_CONVERSATION_ENGINE", "BREATH_PACE_ENGINE"],
+    "SILENCE_MANAGEMENT_ENGINE": ["BREATH_PACE_ENGINE", "SOMATIC_CROWDING_ENGINE", "META_CONVERSATION_ENGINE"],
+    "META_CONVERSATION_ENGINE": ["SILENCE_MANAGEMENT_ENGINE", "HUMOR_COVER_ENGINE", "BLAME_CONCESSION_ENGINE"],
+}
+
+V10_EXTRA_SUPER_FAMILIES = {
+    "PRETEND_COVER_ENGINE": [r"\bpretend\b", r"\bact(?:ing)? like\b", r"\bplay(?:ing)? it off\b", r"\bcover\b", r"\bpass it off\b", r"\bfa[çc]ade\b"],
+    "BREATH_PACE_ENGINE": [r"\bbreath", r"\bexhale\b", r"\bpace\b", r"\bpacing\b", r"\brush\b", r"\bslow\b", r"\bfast\b", r"\brest\b", r"\bcalm\b"],
+    "SOMATIC_CROWDING_ENGINE": [r"\bspace\b", r"\bgap\b", r"\bcrowd", r"\bclose\b", r"\bshoulder\b", r"\broom\b", r"\bframe\b", r"\blean", r"\bstand", r"\bstep", r"\btoe\b", r"\bheel\b"],
+    "THESIS_ADDRESS_ENGINE": [r"\byou assume\b", r"\byou believe\b", r"\byou treat\b", r"\byou decide\b", r"\byou always\b", r"\byou think\b"],
+}
+
+# Merge dynamically without destroying older v9 families.
+for _family, _patterns in V10_EXTRA_SUPER_FAMILIES.items():
+    SUPER_ATTRACTOR_FAMILIES.setdefault(_family, [])
+    for _pat in _patterns:
+        if _pat not in SUPER_ATTRACTOR_FAMILIES[_family]:
+            SUPER_ATTRACTOR_FAMILIES[_family].append(_pat)
+
+
+def expanded_v10_blocked_families(title: str, ledger: str) -> set[str]:
+    """Return direct + hydra-expanded families for this run."""
+    direct = set(classify_title_attractors(title))
+    direct.update(detect_family_hits(ledger or "", SUPER_ATTRACTOR_FAMILIES).keys())
+    # User phrasing can be vague; catch common French short ledger forms.
+    low = (ledger or "").lower()
+    if re.search(r"\bbl[âa]mes?\b|\btort\b|\braison\b", low):
+        direct.add("BLAME_CONCESSION_ENGINE")
+    if re.search(r"\bjokes?\b|\bblagues?\b|\brires?\b|\brire\b|\blaugh\b", low):
+        direct.add("HUMOR_COVER_ENGINE")
+    expanded = set(direct)
+    for fam in list(direct):
+        expanded.update(V10_REFUGE_FAMILY_GRAPH.get(fam, []))
+    # Title literalization is usually a refuge even if not stated by user.
+    if classify_title_attractors(title):
+        expanded.add("LITERAL_EXIT_ENGINE")
+        expanded.update(V10_REFUGE_FAMILY_GRAPH.get("LITERAL_EXIT_ENGINE", []))
+    return expanded
+
+
+def _extract_field(block: str, names: list[str]) -> str:
+    for name in names:
+        m = re.search(rf"^\s*(?:[-*]\s*)?{re.escape(name)}\s*[:=]\s*(.+)$", block, flags=re.I | re.M)
+        if m:
+            return m.group(1).strip()
+    return ""
+
+
+def extract_foundation_gate_block(handoff1: str) -> str:
+    text = handoff1 or ""
+    idx = text.upper().find(FOUNDATION_GATE_HEADER.upper())
+    if idx < 0:
+        return ""
+    tail = text[idx:]
+    stop = re.search(r"\n\s*(?:SECTION BREATH MAP|ROUGH CUT|METER|HANDOFF|A\(0\)|FOUNDATION BRIEF|UNIVERSAL SALIENCE|═{5,})\b", tail, flags=re.I)
+    if stop and stop.start() > 40:
+        return tail[:stop.start()].strip()
+    return tail[:2600].strip()
+
+
+def audit_handoff1_foundation_gate(handoff1: str, ctx: Optional[BuildContext] = None) -> tuple[str, list[AuditIssue]]:
+    """Preflight Handoff 1 before Prompt 2.
+
+    It does not replace human taste. It blocks obvious laundering and missing v10 candidate pool proof.
+    """
+    title = getattr(ctx, "title", "") if ctx else ""
+    ledger = getattr(ctx, "recent_direction_ledger", "") if ctx else ""
+    issues: list[AuditIssue] = []
+    report = [
+        "FOUNDATION PREFLIGHT REPORT — ORPHÉE v10.0 CANDIDATE GATE",
+        "=" * 68,
+        f"CORE FILE LOADED: {CORE_FILE_PATH}",
+        f"TITLE: {title or '[unknown]'}",
+        "QUALITY REPORT MODE: FOUNDATION FAIL BLOCKS PROMPT 2",
+        "",
+    ]
+    text = handoff1 or ""
+    upper = text.upper()
+    if "V10" not in upper and "v10" not in text:
+        issues.append(AuditIssue("QUALITY", None, "FOUNDATION_VERSION", "Handoff 1 does not visibly identify v10 candidate-gated execution."))
+        report.append("❌ v10 marker absent from Handoff 1. Prompt 1 may not have executed the candidate-gated protocol.")
+    if FOUNDATION_POOL_HEADER.upper() not in upper:
+        issues.append(AuditIssue("QUALITY", None, "FOUNDATION_POOL", "FOUNDATION CANDIDATE POOL — v10 block is missing."))
+        report.append(f"❌ Missing required block: {FOUNDATION_POOL_HEADER}")
+    else:
+        report.append(f"✅ Required block present: {FOUNDATION_POOL_HEADER}")
+    gate = extract_foundation_gate_block(text)
+    if not gate:
+        issues.append(AuditIssue("QUALITY", None, "FOUNDATION_GATE", "Selected candidate gate block is missing."))
+        report.append(f"❌ Missing required block: {FOUNDATION_GATE_HEADER}")
+        report.append("STATUT : ❌ BLOCK_PROMPT_2")
+        return "\n".join(report), issues
+    report.append(f"✅ Required block present: {FOUNDATION_GATE_HEADER}")
+
+    selected = _extract_field(gate, ["SELECTED_CANDIDATE_ID", "SELECTED CANDIDATE ID", "Candidate"])
+    hpe = _extract_field(gate, ["SELECTED_HPE", "SELECTED HUMAN PRESSURE ENGINE", "HPE"])
+    chorus = _extract_field(gate, ["CHORUS_FUNCTION", "CHORUS FUNCTION"])
+    title_trans = _extract_field(gate, ["TITLE_TRANSPOSITION", "TITLE TRANSPOSITION"])
+    source_trans = _extract_field(gate, ["SOURCE_TRANSPOSITION", "SOURCE TRANSPOSITION"])
+    local_status = _extract_field(gate, ["LOCAL_GATE_STATUS", "LOCAL GATE STATUS", "GATE STATUS"])
+    declared_blocked = _extract_field(gate, ["BLOCKED_FAMILIES_PRESENT", "BLOCKED FAMILIES PRESENT"])
+    declared_refuge = _extract_field(gate, ["REFUGE_FAMILIES_PRESENT", "REFUGE FAMILIES PRESENT"])
+
+    report.append("\nSelected candidate fields:")
+    report.append(f"- SELECTED_CANDIDATE_ID: {selected or '[missing]'}")
+    report.append(f"- SELECTED_HPE: {hpe or '[missing]'}")
+    report.append(f"- CHORUS_FUNCTION: {chorus or '[missing]'}")
+    report.append(f"- TITLE_TRANSPOSITION: {title_trans or '[missing]'}")
+    report.append(f"- SOURCE_TRANSPOSITION: {source_trans or '[missing]'}")
+    report.append(f"- LOCAL_GATE_STATUS: {local_status or '[missing]'}")
+
+    if not selected or not hpe or not chorus or not title_trans or not source_trans:
+        issues.append(AuditIssue("QUALITY", None, "FOUNDATION_FIELDS", "Required selected-candidate fields are missing."))
+        report.append("❌ Missing selected-candidate proof fields. Prompt 2 blocked.")
+    if local_status and "PASS" not in local_status.upper():
+        issues.append(AuditIssue("QUALITY", None, "FOUNDATION_STATUS", "LOCAL_GATE_STATUS is not PASS."))
+        report.append("❌ LOCAL_GATE_STATUS is not PASS.")
+    if not local_status:
+        issues.append(AuditIssue("QUALITY", None, "FOUNDATION_STATUS", "LOCAL_GATE_STATUS missing."))
+        report.append("❌ LOCAL_GATE_STATUS missing.")
+    if declared_blocked and "NONE" not in declared_blocked.upper():
+        issues.append(AuditIssue("QUALITY", None, "BLOCKED_FAMILY_DECLARED", "Selected candidate declares blocked families present."))
+        report.append(f"❌ BLOCKED_FAMILIES_PRESENT is not NONE: {declared_blocked}")
+    if declared_refuge and "NONE" not in declared_refuge.upper():
+        issues.append(AuditIssue("QUALITY", None, "REFUGE_FAMILY_DECLARED", "Selected candidate declares refuge families present."))
+        report.append(f"❌ REFUGE_FAMILIES_PRESENT is not NONE: {declared_refuge}")
+
+    selected_text = "\n".join([hpe, chorus, title_trans, source_trans])
+    blocked = expanded_v10_blocked_families(title, ledger)
+    hits = detect_family_hits(selected_text, SUPER_ATTRACTOR_FAMILIES)
+    forbidden_hits = {fam: count for fam, count in hits.items() if fam in blocked and count > 0}
+    if forbidden_hits:
+        for fam, count in sorted(forbidden_hits.items()):
+            issues.append(AuditIssue("QUALITY", None, fam, f"Selected foundation hits blocked/refuge family {fam} ({count})."))
+            report.append(f"❌ BLOCKED/REFUGE FAMILY HIT: {fam} ≈ {count}")
+    else:
+        report.append("✅ No direct blocked/refuge family hit detected in selected gate block.")
+
+    # Title laundering and thesis checks on chorus/title lines only.
+    title_low = (title or "").lower().strip()
+    chorus_low = chorus.lower()
+    if title_low and title_low != "title to be determined by ai":
+        title_words = [w for w in re.findall(r"[a-zà-ÿ']+", title_low) if len(w) > 2]
+        if any(re.search(rf"\b{re.escape(w)}\b", chorus_low) for w in title_words):
+            issues.append(AuditIssue("QUALITY", None, "TITLE_LAUNDERING", "Chorus function reuses title word/stem in a blocked title field."))
+            report.append("❌ TITLE-LITERALIZATION / LAUNDERING risk in CHORUS_FUNCTION.")
+    if re.search(r"\byou\s+(?:assume|believe|treat|decide|think|always)\b", chorus, flags=re.I):
+        issues.append(AuditIssue("QUALITY", None, "THESIS_CHORUS", "Chorus function is diagnostic/thesis-address."))
+        report.append("❌ THESIS-CHORUS risk: chorus diagnoses instead of dramatizing behavior.")
+
+    report.append("\nSTATUT : " + ("✅ PASS_TO_PROMPT_2" if not issues else "❌ BLOCK_PROMPT_2"))
+    return "\n".join(report), issues
+
+
+def audit_handoff2_quality_gate(handoff2: str, ctx: Optional[BuildContext] = None) -> tuple[str, list[AuditIssue]]:
+    """Preflight Handoff 2 before Prompt 3. Scans the meter-locked cut for quality-gate collapse."""
+    issues: list[AuditIssue] = []
+    report = [
+        "HANDOFF 2 PREFLIGHT REPORT — ORPHÉE v10.0 QUALITY GATE",
+        "=" * 68,
+        "QUALITY REPORT MODE: FAIL-QUALITY BLOCKS PROMPT 3",
+        "",
+    ]
+    text = handoff2 or ""
+    # Prefer scanning the meter-locked or master cut section; fall back to all text.
+    m = re.search(r"METER-LOCKED CUT(?P<body>.*?)(?:SECTION\s+9|EXACTNESS|FINAL|═{5}|$)", text, flags=re.I | re.S)
+    scan = m.group('body') if m else text
+    # Extract lyric-looking lines to reduce false positives from audit discussion.
+    lyric_lines = []
+    for line in scan.splitlines():
+        s = line.strip()
+        if not s or s.startswith("|") or s.startswith("="):
+            continue
+        if SECTION_TAG_RE.match(s):
+            continue
+        if len(s) < 3:
+            continue
+        lyric_lines.append(s)
+    attr, qf = lexical_attractor_report(lyric_lines or [scan])
+    report.extend(attr)
+    if qf:
+        issues.append(AuditIssue("QUALITY", None, "HANDOFF2_ATTRACTOR", f"{qf} FAIL-QUALITY cluster(s) found before Prompt 3."))
+    report.append("\nSTATUT : " + ("✅ PASS_TO_PROMPT_3" if not issues else "❌ BLOCK_PROMPT_3"))
+    return "\n".join(report), issues
 
 def detect_source_mode(yaourt: str, title: str, instructions: str) -> str:
     return "LOCKED_SOURCE" if yaourt.strip() else "FREE_STRUCTURE"

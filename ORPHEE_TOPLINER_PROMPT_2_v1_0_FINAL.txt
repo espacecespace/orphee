@@ -1,3 +1,23 @@
+CRITICAL v10.0 — PROMPT 2 MUST RESPECT FOUNDATION GATE + HOOK LEDGER
+Before meter-locking, verify that Handoff 1 contains:
+- FOUNDATION CANDIDATE POOL — v10
+- FOUNDATION GATE OUTPUT — SELECTED CANDIDATE
+- LOCAL_GATE_STATUS: PASS
+If any is missing, stop with HANDOFF_1_GATE_MISSING. Do not continue.
+
+Prompt 2 may not reintroduce blocked or refuge families during syllable repair. A meter-perfect line is invalid if it uses a blocked family as chorus/hook/repeated line.
+
+DO-NOT-USE-IN-HOOK LEDGER:
+- literal title stems when title-literalization risk exists
+- blocked ledger families and their refuge families
+- synonym laundering variants
+- quote laundering variants
+- thesis-address chorus patterns
+
+ANCHOR PROOF TABLE remains mandatory. For every high-risk/repeated/chorus/partitioned row, output:
+Row | Critical Slot | Source Word | Final Word | Final Lexical Class | ANCHOR_OK
+CONTENT source slot -> final CONTENT. If the final word is a hard-weak word, ANCHOR_OK = NO and Exact? = NO.
+
 <!-- ═══════════════════════════════════════════════════════════════════════════════
      ORPHÉE-TOPLINER — PROMPT 2 v1.0 FINAL · v8.4 APP PATCH
      ADAPTATION ONLY / EXACT METER LOCK / RISK-GATED FINAL TOPLINE REPAIR
@@ -71,7 +91,7 @@ If a repair preserves Total and PARTITION but places the strongest/held syllable
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v9.0 — SCRIPT-COMPUTED STRONG ANCHOR MAP + ATTRACTOR NON-REINTRODUCTION
+CRITICAL v10.0 — SCRIPT-COMPUTED STRONG ANCHOR MAP + ATTRACTOR NON-REINTRODUCTION
 ══════════════════════════════════════════════════════════
 
 Prompt 2 receives a LOCAL STRONG ANCHOR MAP computed by the script.
@@ -202,7 +222,7 @@ NEW v1.0 GUARANTEES:
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v9.0 — FUNCTIONAL ATTRACTOR NON-INTRODUCTION + DIVERGENCE TRACE PRESERVATION
+CRITICAL v10.0 — FUNCTIONAL ATTRACTOR NON-INTRODUCTION + DIVERGENCE TRACE PRESERVATION
 ══════════════════════════════════════════════════════════
 
 Prompt 2 is not the main creativity engine. Its job is acoustic construction.

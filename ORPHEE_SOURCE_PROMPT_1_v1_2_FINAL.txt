@@ -1,3 +1,40 @@
+CRITICAL v10.0 — CANDIDATE-GATED ARCHITECTURE / NO SINGLE-WINNER BY INSTINCT
+You are no longer allowed to choose a single Human Pressure Engine directly from vibes.
+You must first build a candidate pool, then discard bad paths. The local app will block Prompt 2 if your selected foundation does not expose the required gate block.
+
+MANDATORY OUTPUT BLOCKS BEFORE ANY ROUGH CUT:
+1. FOUNDATION CANDIDATE POOL — v10
+   - Generate exactly 8 candidates: C1-C8.
+   - Each candidate must include: SLOT USED, HPE, CHORUS_FUNCTION, TITLE_TRANSPOSITION, SOURCE_TRANSPOSITION, BLOCKED_FAMILY_RISK, REFUGE_FAMILY_RISK, CONCRETE_CAUSAL_DETAIL, WHY_NOT_DEFAULT.
+   - A candidate violating a blocked dramatic family is discarded, not repaired.
+   - A candidate whose chorus function is blame/concession, humor-cover/pretend-cover, literal-exit/title-copy, silence-management, meta-conversation, somatic-crowding, breath/pace, source-echo, or thesis-address is ineligible when those are blocked or appear as refuge families.
+
+2. LOCAL RERANKING TABLE — v10
+   Columns: Candidate | FunctionalDistance | SourceCompatibility | SingabilityPotential | BlockedFamilyPenalty | RefugeFamilyPenalty | TitleLiteralPenalty | ThesisChorusPenalty | ConcreteCausality | Status.
+   Any hard penalty means Status = DISCARD.
+
+3. FOUNDATION GATE OUTPUT — SELECTED CANDIDATE
+   Use these exact field names because the local script audits them:
+   SELECTED_CANDIDATE_ID:
+   SELECTED_HPE:
+   CHORUS_FUNCTION:
+   TITLE_TRANSPOSITION:
+   SOURCE_TRANSPOSITION:
+   BLOCKED_FAMILIES_PRESENT: NONE or list
+   REFUGE_FAMILIES_PRESENT: NONE or list
+   CONCRETE_CAUSALITY_PROOF:
+   LOCAL_GATE_STATUS: PASS or FAIL
+
+If no candidate passes, stop and output FOUNDATION_POOL_FAILED. Do not write a Rough Cut. Do not lower the standard just to keep producing text. Humanity has suffered enough from mandatory output.
+
+V10 FRAUD BLOCKERS:
+- NO SYNONYM LAUNDERING: changing words while keeping the same dramatic function is still a fail.
+- NO QUOTE LAUNDERING: title or blocked-family phrases remain blocked inside quotes, dialogue, irony, reported speech, parentheses, or meta-framing.
+- NO REFUGE LAUNDERING: if blame/joke/laugh are blocked, do not move the chorus engine into silence/pause, literal exit/go/move, meta-conversation, apology, pretend, breath/pace, or body/space choreography.
+- NO TITLE LAUNDERING: if the title triggers a default family, the chorus/hook may not use the title phrase or its obvious stems.
+- NO THESIS CHORUS: refrain must dramatize behavior; it must not mostly diagnose with “you assume / you believe / you treat / you think / you always”.
+- CONCRETE DETAIL CAUSALITY: a concrete detail is allowed only if it changes an action, avoidance, expectation, misreading, or repeated behavior. Decorative specificity is not originality; it is confetti with a thesaurus.
+
 <!-- ═══════════════════════════════════════════════════════════════════════════════
      ORPHÉE-SOURCE — PROMPT 1 v1.2 FINAL TEST
      ADAPTATION ONLY / SALIENCE BUDGET + PROCESS-FIELD + EVIDENCE AUDIT STABILIZATION
@@ -74,7 +111,7 @@ All objects, spaces, domains, body symptoms, voice mechanics, title vocabulary, 
 Your final deliverable is HANDOFF 1 for Prompt 2.
 
 ══════════════════════════════════════════════════════════
-CRITICAL v9.0 — CREATIVE COORDINATE DIVERGENCE ENGINE
+CRITICAL v10.0 — CREATIVE COORDINATE DIVERGENCE ENGINE
 ══════════════════════════════════════════════════════════
 
 The local interface MUST inject a CREATIVE COORDINATE DIVERGENCE PACKAGE before the source table.
@@ -118,7 +155,7 @@ Once the engine is selected, return attention to human pressure, section movemen
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v9.0 — SUPER-ATTRACTOR VETO / SOURCE TRANSPOSITION / TITLE BRAKE
+CRITICAL v10.0 — SUPER-ATTRACTOR VETO / SOURCE TRANSPOSITION / TITLE BRAKE
 ══════════════════════════════════════════════════════════
 
 A user ledger may be short, messy, bilingual, or lexical, for example "les blâmes, les jokes et les rires".

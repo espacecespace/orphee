@@ -1,3 +1,11 @@
+RÈGLES v10.0 — CANDIDATE-GATED CORRECTION
+- Si l’audit signale FAIL-QUALITY, la correction doit changer la fonction dramatique, pas seulement les mots marqueurs.
+- Ne remplace pas un attracteur par sa famille refuge : blame → apology/silence/literal exit, joke → pretend/meta-conversation/silence, title literal → quote/title laundering.
+- NO QUOTE LAUNDERING : les guillemets, l’ironie ou le discours rapporté ne lavent rien.
+- NO SYNONYM LAUNDERING : un synonyme avec la même fonction reste rejeté.
+- Le refrain/hook ne doit pas porter une famille bloquée ou refuge.
+- Si une correction locale ne peut pas éviter la famille rejetée sans casser la métrique ou le sens, indique QUALITY_GATE_FAILED_BEFORE_FINAL dans le rapport, mais le bloc final pur ne doit contenir que les paroles si une version réparée est réellement fournie.
+
 Tu as généré le dernier Master Cut ORPHÉE.
 
 Voici un audit local indépendant basé sur le blueprint acoustique source. Tu dois corriger uniquement les lignes rejetées ou marquées comme avertissements critiques.
@@ -21,7 +29,7 @@ RÈGLES DE CORRECTION NON NÉGOCIABLES
 - Maximum deux tentatives locales par ligne. Si tu ne peux pas corriger sans casser le texte, donne la meilleure version et indique LOCAL_AUDIT_NEEDED dans le rapport, mais le bloc final doit rester pur.
 - Retourne uniquement le bloc final pur, sans titre, sans commentaire, sans tableau.
 
-- Treat the local Attractor Function Report as a v9.0 QUALITY GATE: FAIL-QUALITY is not a syllable/partition error, but it still blocks final readiness and requires local conceptual repair.
+- Treat the local Attractor Function Report as a v10.0 QUALITY GATE: FAIL-QUALITY is not a syllable/partition error, but it still blocks final readiness and requires local conceptual repair.
 - If the report flags a default-function cluster, correct only when it dominates a hook, chorus, or repeated emotional solution.
 - Do not merely replace a flagged word with a synonym. Change the function only if the function itself is the problem.
 - Preserve all mechanically conforming lines unless they are explicitly listed as fatal or quality-fail.
@@ -37,14 +45,14 @@ ligne
 ligne
 
 
-RÈGLES v9.0 — FRAUDES À BLOQUER
+RÈGLES v10.0 — FRAUDES À BLOQUER
 - HYDRA GATE : si la famille bloquée a été évitée mais remplacée par une famille refuge dominante, répare la fonction, pas seulement les mots.
 - NO QUOTE LAUNDERING : un titre ou attracteur interdit reste interdit entre guillemets, en discours rapporté, en ironie ou en parenthèses.
 - THESIS-CHORUS VETO : si le refrain diagnostique surtout avec "you assume / you believe / you treat / you think", reconstruis-le en comportement chantable.
 - DETAIL CAUSALITY : un détail concret doit modifier une action ou une attente; sinon, il est décoratif et doit disparaître.
 - ANCHOR PROOF : une correction d’attaque forte doit placer un mot porteur sur la syllabe critique.
 
-RÈGLES v9.0 — ATTRACTEURS QUALITÉ
+RÈGLES v10.0 — ATTRACTEURS QUALITÉ
 - Si l’audit signale FAIL-QUALITY, ne te contente pas de remplacer les mots marqueurs.
 - Répare la fonction dramatique : blâme/concession, humour-cover, méta-conversation, silence-management, sortie littérale ou calque source.
 - Ne réintroduis pas le titre littéral comme hook si l’audit l’a classé comme attracteur.

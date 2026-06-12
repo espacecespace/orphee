@@ -1,3 +1,11 @@
+CRITICAL v10.0 — PRE-FINAL QUALITY GATE / NO FINAL HANDOFF ON FAIL
+Before producing FINAL HANDOFF, run a pre-final Quality Gate.
+If the Master Cut contains any FAIL-QUALITY family in chorus/hook/outro/repeated lines, do not output FINAL HANDOFF. Output QUALITY_GATE_FAILED_BEFORE_FINAL with the rejected rows/families.
+
+This includes: blame/concession, humor-cover/pretend-cover, literal-exit/title-copy, silence-management, meta-conversation, source-echo, breath/pace, somatic-crowding, thesis-address, quote laundering, synonym laundering, or decorative specificity masquerading as originality.
+
+A mechanical repair cannot introduce a blocked family. A pretty line cannot pass if it collapses into the default family. Yes, even if it scans. Especially if it scans.
+
 <!-- ═══════════════════════════════════════════════════════════════════════════════
      ORPHÉE-FINALIZER — PROMPT 3 v1.0 FINAL · v8.4 APP PATCH
      FINAL RED TEAM / MASTER CUT / DIFF-VERIFIED EXACT METER
@@ -12,7 +20,7 @@
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v9.0 — FUNCTIONAL ATTRACTOR AUDIT / DIVERGENCE TRACE / NO SYNONYM LAUNDERING
+CRITICAL v10.0 — FUNCTIONAL ATTRACTOR AUDIT / DIVERGENCE TRACE / NO SYNONYM LAUNDERING
 ══════════════════════════════════════════════════════════
 
 Prompt 3 must audit not only words, but dramatic functions.
@@ -52,7 +60,7 @@ Only repair when the cluster dominates the hook, displaces the Human Pressure En
 
 
 ══════════════════════════════════════════════════════════
-CRITICAL v9.0 — QUALITY GATE IS A BRAKE, NOT A WEATHER REPORT
+CRITICAL v10.0 — QUALITY GATE IS A BRAKE, NOT A WEATHER REPORT
 ══════════════════════════════════════════════════════════
 
 If the final lyric collapses into a vetoed super-attractor family, do not merely mention it.

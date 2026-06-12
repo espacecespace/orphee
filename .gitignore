@@ -23,3 +23,8 @@ Thumbs.db
 *_PROMPT_*.txt
 *_RAPPORT*.txt
 *_CORRECTION*.txt
+
+# Sources de préparation non déployées
+local/
+web/
+Convo-processus-entier-Orphee.txt

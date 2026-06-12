@@ -1,3 +1,7 @@
+# ORPHÉE v10.0 Candidate-Gated
+
+Cette version ajoute un Candidate Gate local : Prompt 1 doit produire un pool de 8 fondations et un bloc `FOUNDATION GATE OUTPUT — SELECTED CANDIDATE`. L’app bloque Prompt 2 si ce bloc manque ou s’il retombe dans une famille dramaturgique interdite/refuge. Prompt 2 et Prompt 3 ont aussi des Quality Gates pré-final. Oui, le portique existe enfin avant la piste de décollage.
+
 # ORPHÉE v9.0 — Version Streamlit Cloud SANS SOUS-DOSSIERS
 
 Cette version est faite pour éviter le cauchemar GitHub des sous-dossiers. Tous les fichiers doivent être téléversés **à la racine** du dépôt GitHub.

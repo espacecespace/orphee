@@ -22,6 +22,10 @@ Pour vérifier le projet avant publication :
 - Chaque publication sur `main` déclenche automatiquement la validation GitHub Actions définie dans `.github/workflows/ci.yml`.
 - Les dossiers `local/` et `web/` restent des paquets de préparation non publiés; ils ne doivent pas remplacer silencieusement la racine.
 
+## Laboratoire d'essais ChatGPT
+
+Double-cliquez sur `creer_nouvel_essai.bat` pour créer un dossier guidé dans `evals/runs/`. Conservez-y les trois prompts envoyés, les réponses complètes avec leurs handoffs, le texte final, l'audit local et votre évaluation humaine. Les résultats restent privés et ignorés par Git; seuls le modèle de dossier et sa documentation sont publiés.
+
 # ORPHÉE v9.0 — Version Streamlit Cloud SANS SOUS-DOSSIERS
 
 Cette version est faite pour éviter le cauchemar GitHub des sous-dossiers. Tous les fichiers doivent être téléversés **à la racine** du dépôt GitHub.

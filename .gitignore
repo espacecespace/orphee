@@ -23,6 +23,10 @@ Thumbs.db
 exports/
 .streamlit-test*.log
 
+# Resultats d'essais prives (les modeles et la documentation restent suivis)
+evals/runs/*
+!evals/runs/.gitkeep
+
 # Sources de préparation non déployées
 local/
 web/

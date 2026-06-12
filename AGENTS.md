@@ -17,6 +17,12 @@ Avant chaque commit qui touche Python ou les gabarits :
 
 Si `python` n'est pas disponible, utiliser un interpreteur Python 3.11+ valide et signaler clairement lequel a servi.
 
+## Git sous Windows
+
+- Sur cette machine, preferer `.tools/git/cmd/git.exe` pour les operations reseau; l'ancien Git systeme a deja plante dans `git-remote-https.exe`.
+- Si l'outil portable est absent, ne pas le versionner : le reinstaller localement dans `.tools/`, deja ignore par Git.
+- Apres un push, verifier `git status --short --branch` puis le resultat du workflow `Validate Orphee` sur GitHub Actions.
+
 ## Regles de changement
 
 - Ne pas publier si la compilation ou les tests echouent.

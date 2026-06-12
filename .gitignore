@@ -19,12 +19,14 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Exports locaux
-*_PROMPT_*.txt
-*_RAPPORT*.txt
-*_CORRECTION*.txt
+# Exports et journaux locaux
+exports/
+.streamlit-test*.log
 
 # Sources de préparation non déployées
 local/
 web/
 Convo-processus-entier-Orphee.txt
+
+# Outils portables locaux
+.tools/

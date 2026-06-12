@@ -2,6 +2,26 @@
 
 Cette version ajoute un Candidate Gate local : Prompt 1 doit produire un pool de 8 fondations et un bloc `FOUNDATION GATE OUTPUT — SELECTED CANDIDATE`. L’app bloque Prompt 2 si ce bloc manque ou s’il retombe dans une famille dramaturgique interdite/refuge. Prompt 2 et Prompt 3 ont aussi des Quality Gates pré-final. Oui, le portique existe enfin avant la piste de décollage.
 
+## Utilisation locale
+
+Double-cliquez sur `lancer_orphee_local.bat`. Le lanceur utilise l'environnement Python isolé `.venv` du projet et ouvre l'interface Streamlit.
+
+Pour vérifier le projet avant publication :
+
+```powershell
+.venv\Scripts\python.exe scripts\validate_project.py
+.venv\Scripts\python.exe -m pytest
+.venv\Scripts\python.exe -m ruff check .
+```
+
+## Flux Codex, GitHub et Streamlit
+
+- La racine du dépôt est la version de référence utilisée par Streamlit Cloud.
+- Codex modifie et teste les fichiers dans ce dossier.
+- GitHub Desktop affiche les changements, les commits locaux et la commande `Push origin`.
+- Chaque publication sur `main` déclenche automatiquement la validation GitHub Actions définie dans `.github/workflows/ci.yml`.
+- Les dossiers `local/` et `web/` restent des paquets de préparation non publiés; ils ne doivent pas remplacer silencieusement la racine.
+
 # ORPHÉE v9.0 — Version Streamlit Cloud SANS SOUS-DOSSIERS
 
 Cette version est faite pour éviter le cauchemar GitHub des sous-dossiers. Tous les fichiers doivent être téléversés **à la racine** du dépôt GitHub.
